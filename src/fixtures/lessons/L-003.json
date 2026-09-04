@@ -5,7 +5,7 @@
   "blocks": [
     {
       "type": "heading",
-      "level": 1,
+      "level": 2,
       "content": [{ "type": "text", "text": "Continuity" }]
     },
     {
