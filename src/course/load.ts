@@ -1,4 +1,4 @@
-import type { Block, Lesson } from './schema'
+import type { Block } from './schema'
 import { block as blockSchema, lessonSchema } from './schema'
 
 // A renderable block is either a valid block or a labelled hole. Unknown or
