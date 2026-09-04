@@ -12,15 +12,20 @@ function startsWith(bytes: Uint8Array, sig: number[]): boolean {
 
 // Raster only (§8.3). SVG is rejected outright — it carries script and is not
 // worth sanitizing. Anything that is not a known raster signature is refused.
+export function detectImageType(bytes: Uint8Array): string | null {
+  if (bytes.length < 12) return null
+  if (startsWith(bytes, PNG)) return 'image/png'
+  if (startsWith(bytes, JPEG)) return 'image/jpeg'
+  if (startsWith(bytes, GIF)) return 'image/gif'
+  if (startsWith(bytes, BMP)) return 'image/bmp'
+  if (startsWith(bytes, RIFF) && String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]) === 'WEBP') {
+    return 'image/webp'
+  }
+  return null
+}
+
 export function isRasterImage(bytes: Uint8Array): boolean {
-  if (bytes.length < 12) return false
-  if (startsWith(bytes, PNG) || startsWith(bytes, JPEG) || startsWith(bytes, GIF) || startsWith(bytes, BMP)) {
-    return true
-  }
-  if (startsWith(bytes, RIFF)) {
-    return String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]) === 'WEBP'
-  }
-  return false
+  return detectImageType(bytes) !== null
 }
 
 function looksLikeSvg(bytes: Uint8Array): boolean {
@@ -35,11 +40,15 @@ export function checkRaster(bytes: Uint8Array): RasterCheck {
   return { ok: false, reason: 'file does not decode as a known raster image' }
 }
 
-export function bytesToObjectUrl(bytes: Uint8Array): string {
-  const blob = new Blob([bytes.slice(0)], { type: 'application/octet-stream' })
-  return URL.createObjectURL(blob)
-}
-
-export function revokeObjectUrl(url: string): void {
-  URL.revokeObjectURL(url)
+// Data URLs are self-contained: no blob lifecycle to leak or to revoke under
+// React StrictMode's mount→cleanup→remount. The CSP already allows data:.
+export function bytesToDataUrl(bytes: Uint8Array): string | null {
+  const mime = detectImageType(bytes)
+  if (!mime) return null
+  let binary = ''
+  const chunk = 0x8000
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk))
+  }
+  return `data:${mime};base64,${btoa(binary)}`
 }

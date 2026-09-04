@@ -57,7 +57,7 @@ describe('figure rendering', () => {
     render(<FigureBlock block={block} bytes={pngBytes} />)
     const img = document.querySelector('img')
     expect(img).not.toBeNull()
-    expect(img?.src.startsWith('blob:')).toBe(true)
+    expect(img?.src.startsWith('data:image/png;base64,')).toBe(true)
     expect(screen.getByText('A caption.')).toBeInTheDocument()
   })
 
@@ -68,11 +68,19 @@ describe('figure rendering', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/SVG is not supported/)
   })
 
-  it('does not load a remote URL and shows an inline error instead', () => {
-    const block = figureBlock('https://evil.example/figure.png')
+  it('rejects a remote URL at the schema boundary', () => {
+    const remote = figureSchema.safeParse({
+      type: 'figure',
+      src: 'https://evil.example/figure.png',
+      caption: [{ type: 'text', text: 'x' }],
+    })
+    expect(remote.success).toBe(false)
+  })
+
+  it('shows an inline error when a figure is missing its bytes', () => {
+    const block = figureBlock('figures/x.png')
     render(<FigureBlock block={block} />)
-    const imgs = Array.from(document.querySelectorAll('img'))
-    expect(imgs.every((img) => !img.src.includes('https://'))).toBe(true)
+    expect(document.querySelector('img')).toBeNull()
     expect(screen.getByRole('status')).toHaveTextContent(/figure not found/)
   })
 

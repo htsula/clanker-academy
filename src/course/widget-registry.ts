@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ComponentType } from 'react'
 import { z } from 'zod'
 import type { Block } from './schema'
 
@@ -19,13 +19,18 @@ export interface WidgetRegistration {
   major: number
   version: WidgetVersion
   schema: z.ZodType<unknown>
-  render: (params: unknown) => ReactNode
+  // A component, not a render function: WidgetBlock wraps it in an error
+  // boundary, so a throw inside the widget's own render cannot take down the
+  // lesson. An eagerly-invoked render() would throw in the parent's render,
+  // above the boundary.
+  Component: ComponentType<{ params: unknown }>
 }
 
 export type WidgetResolve =
   | { status: 'ok'; registration: WidgetRegistration; params: unknown }
   | { status: 'unknown-name' }
   | { status: 'unknown-major' }
+  | { status: 'invalid-version' }
   | { status: 'version-unsatisfiable'; shipped: WidgetVersion }
   | { status: 'invalid-parameters' }
 
@@ -56,7 +61,7 @@ export function resolveWidget(name: string, requested: string, parameters: unkno
   const parsed = parseWidgetVersion(requested)
   const majors = widgetMajors(name)
   if (majors.length === 0) return { status: 'unknown-name' }
-  if (!parsed) return { status: 'invalid-parameters' }
+  if (!parsed) return { status: 'invalid-version' }
 
   const registration = majors.find((r) => r.major === parsed.major)
   if (!registration) return { status: 'unknown-major' }

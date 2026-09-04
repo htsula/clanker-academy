@@ -10,5 +10,5 @@ registerWidget({
   major: 1,
   version: { major: 1, minor: 0 },
   schema: plotParamsSchema,
-  render: (params) => <PlotWidget params={params as PlotParams} />,
+  Component: (props) => <PlotWidget params={props.params as PlotParams} />,
 })

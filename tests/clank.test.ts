@@ -63,6 +63,14 @@ describe('the committed course.clank', () => {
     const result = await openClank(fromB64)
     expect(result.ok).toBe(true)
   })
+
+  it('was packed from exactly the fixture files — no build artifacts inside', () => {
+    const entries = Object.keys(unzipSync(readFileSync(join(fixtureRoot, 'course.clank')))).sort()
+    const expected = ['manifest.json', ...Object.keys(readFixtures()).filter((p) => p !== 'manifest.json')].sort()
+    expect(entries).toEqual(expected)
+    expect(entries).not.toContain('course.clank.b64')
+    expect(entries).not.toContain('course.clank')
+  })
 })
 
 describe('integrity verification', () => {
@@ -82,7 +90,7 @@ describe('integrity verification', () => {
     expect(result.reason).toMatch(/integrity mismatch for lessons\/L-001\.json/)
   })
 
-  it('refuses content_hash mismatch when an extra file is added', async () => {
+  it('refuses a file smuggled in alongside the expected set', async () => {
     const files = readFixtures()
     const clank = await buildClank(files)
 
@@ -92,7 +100,22 @@ describe('integrity verification', () => {
 
     expect(result.ok).toBe(false)
     if (result.ok) return
-    expect(result.reason).toMatch(/content hash mismatch/)
+    expect(result.reason).toMatch(/integrity map does not cover every file/)
+  })
+
+  it('refuses an incomplete integrity map, even when every listed hash matches', async () => {
+    const files = readFixtures()
+    const clank = await buildClank(files)
+
+    const tampered = unzipSync(clank)
+    const manifest = JSON.parse(new TextDecoder().decode(tampered['manifest.json']))
+    manifest.integrity = {}
+    tampered['manifest.json'] = strToU8(JSON.stringify(manifest))
+    const result = await openClank(zipSync(tampered))
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.reason).toMatch(/integrity map does not cover every file/)
   })
 })
 
@@ -124,5 +147,27 @@ describe('schema validation at the boundary', () => {
   it('refuses bytes that are not a zip', async () => {
     const result = await openClank(new Uint8Array([1, 2, 3, 4, 5]))
     expect(result).toEqual({ ok: false, reason: 'not a valid zip archive' })
+  })
+
+  it('refuses a zip whose declared uncompressed size exceeds the budget', async () => {
+    // A hand-built local file header claiming 80 MB uncompressed. The budget
+    // check must refuse it before anything is decompressed.
+    const header = new Uint8Array(30 + 4)
+    header[0] = 0x50
+    header[1] = 0x4b
+    header[2] = 0x03
+    header[3] = 0x04
+    header[22] = 0x00
+    header[23] = 0x00
+    header[24] = 0x00
+    header[25] = 0x05 // 0x05000000 = 80 MiB
+    header[26] = 4 // name length
+    const name = strToU8('boom')
+    header.set(name, 30)
+
+    const result = await openClank(header)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.reason).toMatch(/exceeds the budget/)
   })
 })

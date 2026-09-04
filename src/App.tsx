@@ -42,11 +42,15 @@ function App() {
 
   useEffect(() => {
     let alive = true
-    openClank(base64ToBytes(clankB64)).then((result) => {
-      if (!alive) return
-      if (result.ok) setCourse(result.course)
-      else setError(result.reason)
-    })
+    openClank(base64ToBytes(clankB64))
+      .then((result) => {
+        if (!alive) return
+        if (result.ok) setCourse(result.course)
+        else setError(result.reason)
+      })
+      .catch(() => {
+        if (alive) setError('failed to open course')
+      })
     return () => {
       alive = false
     }

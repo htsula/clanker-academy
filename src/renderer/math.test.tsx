@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { loadLesson } from '../course/load'
 import { MATH_DEPTH_MAX, MATH_SOURCE_MAX } from '../course/schema'
+import { InlineMath } from './InlineMath'
 import { LessonPage } from './LessonPage'
 
 function lessonWithMath(blocks: unknown[]) {
@@ -36,22 +37,18 @@ describe('math rendering', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/parse error|could not render|KaTeX/)
   })
 
-  it('refuses an expression over the length cap', () => {
-    const lesson = lessonWithMath([
-      { type: 'equation', source: 'x'.repeat(MATH_SOURCE_MAX + 1), display: true },
-      { type: 'paragraph', content: [{ type: 'text', text: 'Still readable.' }] },
-    ])
-    render(<LessonPage lesson={lesson} figures={new Map()} />)
-
+  it('refuses an expression over the length cap at the renderer guard', () => {
+    // Directly exercises guardError in InlineMath — the schema path is covered
+    // separately in tests/schema.test.ts. These are two independent layers.
+    render(<InlineMath source={'x'.repeat(MATH_SOURCE_MAX + 1)} />)
     expect(screen.getByRole('status')).toHaveTextContent(/length cap/)
-    expect(screen.getByText('Still readable.')).toBeInTheDocument()
+    expect(document.querySelector('.katex')).toBeNull()
   })
 
-  it('refuses an expression over the nesting cap', () => {
+  it('refuses an expression over the nesting cap at the renderer guard', () => {
     const deep = '\\frac{' + '{'.repeat(MATH_DEPTH_MAX + 1) + 'x' + '}'.repeat(MATH_DEPTH_MAX + 1) + '}'
-    const lesson = lessonWithMath([{ type: 'equation', source: deep, display: true }])
-    render(<LessonPage lesson={lesson} figures={new Map()} />)
-
+    render(<InlineMath source={deep} />)
     expect(screen.getByRole('status')).toHaveTextContent(/nesting cap/)
+    expect(document.querySelector('.katex')).toBeNull()
   })
 })

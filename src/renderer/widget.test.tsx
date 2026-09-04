@@ -1,11 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import type { Block } from '../course/schema'
 import { loadLesson } from '../course/load'
+import { PlotWidget } from '../course/widgets/plot'
 import {
   collectWidgets,
   isWidgetSatisfiable,
   parseWidgetVersion,
+  registerWidget,
+  resolveWidget,
   type WidgetVersion,
 } from '../course/widget-registry'
 import { LessonPage } from './LessonPage'
@@ -93,6 +97,16 @@ describe('widget rendering', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/unknown widget/)
   })
 
+  it('distinguishes a malformed version from bad parameters', () => {
+    render(
+      <WidgetBlock
+        block={{ type: 'widget', name: 'plot', version: '1.x', parameters: {} }}
+      />,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent(/malformed version/)
+    expect(screen.getByRole('status')).not.toHaveTextContent(/parameters/)
+  })
+
   it('refuses unrecognized parameters', () => {
     render(
       <WidgetBlock
@@ -123,6 +137,52 @@ describe('widget rendering', () => {
     expect(screen.getByRole('status')).toHaveTextContent('plot@2.0')
     expect(screen.getByText('Readable.')).toBeInTheDocument()
     expect(screen.getByText('Still readable.')).toBeInTheDocument()
+  })
+
+  it('a widget that throws during render is caught by the boundary and does not take down the lesson', () => {
+    registerWidget({
+      name: 'exploder',
+      major: 1,
+      version: { major: 1, minor: 0 },
+      schema: z.object({}).strict(),
+      Component: () => {
+        throw new Error('boom')
+      },
+    })
+    const lesson = loadLesson({
+      id: 'L-903',
+      title: 'Exploder',
+      atom_ids: [],
+      blocks: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'Before.' }] },
+        { type: 'widget', name: 'exploder', version: '1.0', parameters: {} },
+        { type: 'paragraph', content: [{ type: 'text', text: 'After.' }] },
+      ],
+    })
+    render(<LessonPage lesson={lesson} figures={new Map()} />)
+    expect(screen.getByRole('status')).toHaveTextContent('exploder@1.0')
+    expect(screen.getByRole('status')).toHaveTextContent(/crashed while rendering/)
+    expect(screen.getByText('Before.')).toBeInTheDocument()
+    expect(screen.getByText('After.')).toBeInTheDocument()
+  })
+
+  it('rejects a plot range where min >= max at the schema', () => {
+    const result = resolveWidget('plot', '1.0', {
+      series: [{ points: [[0, 0]] }],
+      xmin: 5,
+      xmax: 5,
+    })
+    expect(result.status).toBe('invalid-parameters')
+  })
+
+  it('does not divide by zero when an explicit range conflicts with the data', () => {
+    render(
+      <PlotWidget
+        params={{ series: [{ label: 's', points: [[0, 0], [1, 1]] }], xmin: 5 }}
+      />,
+    )
+    expect(screen.getByText('invalid plot range')).toBeInTheDocument()
+    expect(document.querySelector('svg')).toBeNull()
   })
 })
 

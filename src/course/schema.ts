@@ -8,11 +8,14 @@ import { z } from 'zod'
 // --- Security helpers ----------------------------------------------------
 
 const HTML_TAG = /<[a-z!/][^>]*>/i
-const JS_HOOK = /(on\w+\s*=|javascript\s*:)/i
 
+// A course file must never contain raw HTML. React escapes every text node and
+// there is no HTML-parsing path in the renderer, so the meaningful check is
+// tag-shaped content — not word-boundary heuristics, which reject ordinary
+// English ("one = 1", "conditional = true") for no security gain.
 export const noHtml = z
   .string()
-  .refine((s) => !HTML_TAG.test(s) && !JS_HOOK.test(s), {
+  .refine((s) => !HTML_TAG.test(s), {
     message: 'HTML-like content is not allowed in course files',
   })
 
@@ -29,7 +32,7 @@ export function mathDepth(source: string): number {
       depth += 1
       if (depth > max) max = depth
     } else if (ch === '}') {
-      depth -= 1
+      depth = Math.max(0, depth - 1)
     }
   }
   return max
@@ -100,9 +103,12 @@ export const equation = z.object({
   number: noHtml.optional(),
 })
 
+// Raster figures live inside the course file's own figures/ folder. A src
+// outside that namespace (a remote URL, an absolute path, a relative escape)
+// is refused at the schema, before any renderer sees it.
 export const figure = z.object({
   type: z.literal('figure'),
-  src: noHtml,
+  src: z.string().regex(/^figures\/[A-Za-z0-9._-]+$/, 'figure src must be a path inside figures/'),
   caption: inlineArray.optional(),
   atom_id: noHtml.optional(),
 })

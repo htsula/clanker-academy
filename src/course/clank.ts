@@ -48,7 +48,43 @@ export function base64ToBytes(b64: string): Uint8Array {
   return bytes
 }
 
+// A course file is a document from a stranger, so opening it is a budgeted
+// operation. This scans the local file headers before anything decompresses —
+// fflate's unzipSync would otherwise decompress a zip bomb fully before we
+// could refuse it. Heuristic by nature (data descriptors end the scan early),
+// which is fine: it bounds the common case, and M1's import path owns the real
+// defense.
+const MAX_CLANK_ENTRIES = 1000
+const MAX_CLANK_UNCOMPRESSED = 64 * 1024 * 1024
+
+function zipBudget(bytes: Uint8Array): { ok: true } | { ok: false; reason: string } {
+  let i = 0
+  let entries = 0
+  let total = 0
+  const len = bytes.length
+  while (i + 30 <= len) {
+    if (bytes[i] !== 0x50 || bytes[i + 1] !== 0x4b) break
+    const isLocalHeader = bytes[i + 2] === 0x03 && bytes[i + 3] === 0x04
+    if (!isLocalHeader) break
+    const compSize =
+      bytes[i + 18] | (bytes[i + 19] << 8) | (bytes[i + 20] << 16) | (bytes[i + 21] << 24)
+    const uncompSize =
+      bytes[i + 22] | (bytes[i + 23] << 8) | (bytes[i + 24] << 16) | (bytes[i + 25] << 24)
+    const nameLen = bytes[i + 26] | (bytes[i + 27] << 8)
+    const extraLen = bytes[i + 28] | (bytes[i + 29] << 8)
+    entries += 1
+    total += uncompSize
+    if (entries > MAX_CLANK_ENTRIES) return { ok: false, reason: 'archive has too many entries' }
+    if (total > MAX_CLANK_UNCOMPRESSED) return { ok: false, reason: 'archive uncompressed size exceeds the budget' }
+    i += 30 + nameLen + extraLen + compSize
+  }
+  return { ok: true }
+}
+
 export async function openClank(bytes: Uint8Array): Promise<OpenResult> {
+  const budget = zipBudget(bytes)
+  if (!budget.ok) return { ok: false, reason: budget.reason }
+
   let files: Record<string, Uint8Array>
   try {
     files = unzipSync(bytes)
@@ -62,6 +98,16 @@ export async function openClank(bytes: Uint8Array): Promise<OpenResult> {
   const manifestResult = parse(manifestBytes, 'manifest.json', parseManifest)
   if ('error' in manifestResult) return { ok: false, reason: manifestResult.error }
   const manifest = manifestResult
+
+  // integrity must be complete, not merely consistent: the map has to name
+  // exactly the non-manifest files, or a file can ride in unchecked.
+  const integrityPaths = Object.keys(manifest.integrity).sort()
+  const filePaths = Object.keys(files)
+    .filter((p) => p !== 'manifest.json')
+    .sort()
+  if (integrityPaths.join('\n') !== filePaths.join('\n')) {
+    return { ok: false, reason: 'integrity map does not cover every file in the archive' }
+  }
 
   for (const [path, expected] of Object.entries(manifest.integrity)) {
     const actualBytes = files[path]

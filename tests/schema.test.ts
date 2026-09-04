@@ -87,9 +87,15 @@ describe('schema rejections', () => {
     expect(() => manifestSchema.parse(broken)).toThrow()
   })
 
-  it('rejects a spine missing the atoms list', () => {
+  it('rejects a spine missing the modules list', () => {
     const broken = { ...(spine as Record<string, unknown>) }
     delete (broken as { modules?: unknown }).modules
+    expect(() => spineSchema.parse(broken)).toThrow()
+  })
+
+  it('rejects a spine missing the atoms list', () => {
+    const broken = { ...(spine as Record<string, unknown>) }
+    delete (broken as { atoms?: unknown }).atoms
     expect(() => spineSchema.parse(broken)).toThrow()
   })
 })

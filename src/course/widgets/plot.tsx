@@ -15,10 +15,11 @@ export const plotParamsSchema = z
       .array(
         z.object({
           label: noHtml.optional(),
-          points: z.array(point).min(1),
+          points: z.array(point).min(1).max(2000),
         }),
       )
-      .min(1),
+      .min(1)
+      .max(20),
     title: noHtml.optional(),
     xlabel: noHtml.optional(),
     ylabel: noHtml.optional(),
@@ -28,6 +29,14 @@ export const plotParamsSchema = z
     ymax: z.number().optional(),
   })
   .strict()
+  .refine((p) => !(p.xmin !== undefined && p.xmax !== undefined && p.xmin >= p.xmax), {
+    message: 'xmin must be less than xmax',
+    path: ['xmin'],
+  })
+  .refine((p) => !(p.ymin !== undefined && p.ymax !== undefined && p.ymin >= p.ymax), {
+    message: 'ymin must be less than ymax',
+    path: ['ymin'],
+  })
 
 export type PlotParams = z.infer<typeof plotParamsSchema>
 
@@ -35,8 +44,20 @@ const W = 480
 const H = 320
 const M = 44
 
+function minOf(values: number[]): number {
+  return values.reduce((m, v) => (v < m ? v : m), Infinity)
+}
+
+function maxOf(values: number[]): number {
+  return values.reduce((m, v) => (v > m ? v : m), -Infinity)
+}
+
 function scale(v: number, lo: number, hi: number): number {
   return (v - lo) / (hi - lo)
+}
+
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.min(Math.max(v, lo), hi)
 }
 
 function fmt(v: number): string {
@@ -47,21 +68,27 @@ export function PlotWidget({ params }: { params: PlotParams }) {
   const allX = params.series.flatMap((s) => s.points.map((p) => p[0]))
   const allY = params.series.flatMap((s) => s.points.map((p) => p[1]))
 
-  const lo = Math.min(...allX)
-  const hi = Math.max(...allX)
-  const loY = Math.min(...allY)
-  const hiY = Math.max(...allY)
+  const lo = minOf(allX)
+  const hi = maxOf(allX)
+  const loY = minOf(allY)
+  const hiY = maxOf(allY)
 
   const xmin = params.xmin ?? lo - (hi - lo || 1) * 0.08
   const xmax = params.xmax ?? hi + (hi - lo || 1) * 0.08
   const ymin = params.ymin ?? loY - (hiY - loY || 1) * 0.08
   const ymax = params.ymax ?? hiY + (hiY - loY || 1) * 0.08
 
+  if (!(xmax > xmin) || !(ymax > ymin)) {
+    return <p className="widget-param-error">invalid plot range</p>
+  }
+
   const fx = (x: number) => M + scale(x, xmin, xmax) * (W - 2 * M)
   const fy = (y: number) => H - M - scale(y, ymin, ymax) * (H - 2 * M)
 
-  const x0 = fx(0)
-  const y0 = fy(0)
+  // Axes may lie outside the plot area when the data does not straddle the
+  // origin; clamp them to the frame so they never render off-canvas.
+  const yAxisX = clamp(fx(0), M, W - M)
+  const xAxisY = clamp(fy(0), M, H - M)
 
   const xticks = 5
   const yticks = 4
@@ -97,8 +124,8 @@ export function PlotWidget({ params }: { params: PlotParams }) {
         )
       })}
 
-      <line x1={M} y1={y0} x2={W - M} y2={y0} className="plot-axis" />
-      <line x1={x0} y1={M} x2={x0} y2={H - M} className="plot-axis" />
+      <line x1={M} y1={xAxisY} x2={W - M} y2={xAxisY} className="plot-axis" />
+      <line x1={yAxisX} y1={M} x2={yAxisX} y2={H - M} className="plot-axis" />
 
       {params.series.map((series, i) => {
         const points = series.points.map(([x, y]) => `${fx(x)},${fy(y)}`).join(' ')

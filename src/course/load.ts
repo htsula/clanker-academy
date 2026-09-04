@@ -24,14 +24,17 @@ const lessonHeader = lessonSchema.pick({ id: true, title: true, atom_ids: true }
 
 export function loadLesson(value: unknown): LoadedLesson {
   const header = lessonHeader.parse(value)
-  const rawBlocks = (value as { blocks?: unknown[] }).blocks ?? []
+  const raw = (value as { blocks?: unknown }).blocks
+  if (!Array.isArray(raw)) {
+    throw new Error('lesson blocks must be an array')
+  }
   const blocks: RenderableBlock[] = []
-  for (const raw of rawBlocks) {
-    const parsed = blockSchema.safeParse(raw)
+  for (const rawBlock of raw) {
+    const parsed = blockSchema.safeParse(rawBlock)
     if (parsed.success) {
       blocks.push(parsed.data)
     } else {
-      const rawType = (raw as { type?: unknown }).type
+      const rawType = (rawBlock as { type?: unknown }).type
       blocks.push({
         type: typeof rawType === 'string' ? rawType : '(untyped)',
         parseError: parsed.error.issues[0]?.message ?? 'failed to parse',

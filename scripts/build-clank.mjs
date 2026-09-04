@@ -32,7 +32,7 @@ function walk(dir) {
 const files = {}
 for (const abs of walk(fixtureRoot)) {
   const rel = relative(fixtureRoot, abs).replaceAll('\\', '/')
-  if (rel === 'course.clank') continue
+  if (rel === 'course.clank' || rel === 'course.clank.b64') continue
   if (!statSync(abs).isFile()) continue
   files[rel] = readFileSync(abs)
 }
