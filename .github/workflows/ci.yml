@@ -67,3 +67,10 @@ jobs:
 
       - name: Build
         run: npm run tauri build
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: clanker-academy-${{ matrix.os }}
+          path: src-tauri/target/release/bundle/
+          if-no-files-found: error
