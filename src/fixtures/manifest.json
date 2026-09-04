@@ -1,28 +1,63 @@
 {
   "course_id": "7f3a9b1e-2c4d-4e5f-8a9b-0c1d2e3f4a5b",
   "version": 1,
-  "content_hash": "computed-by-build-clank",
+  "content_hash": "c0ec4b45b96bc8a93c344bfe4f883154dbbfd4e9007a2c3fdb018cd5e21f4fe0",
   "title": "Introduction to Limits and Continuity",
   "subject": "Calculus",
   "level": "First-year undergraduate",
   "hours_estimate": 6,
-  "prereq_courses": ["College Algebra"],
+  "prereq_courses": [
+    "College Algebra"
+  ],
   "prereq_atoms": [],
   "generator": {
     "harness_version": "0.0.0-m0",
     "pipeline": [
-      { "stage": "charter", "config": {} },
-      { "stage": "spine", "config": {} },
-      { "stage": "instruction", "config": {} },
-      { "stage": "package", "config": {} }
+      {
+        "stage": "charter",
+        "config": {}
+      },
+      {
+        "stage": "spine",
+        "config": {}
+      },
+      {
+        "stage": "instruction",
+        "config": {}
+      },
+      {
+        "stage": "package",
+        "config": {}
+      }
     ],
-    "models": { "instruction": "hand-authored" },
+    "models": {
+      "instruction": "hand-authored"
+    },
     "generated_at": "2026-09-03T00:00:00Z",
-    "tokens": { "instruction": { "in": 0, "out": 0 } },
+    "tokens": {
+      "instruction": {
+        "in": 0,
+        "out": 0
+      }
+    },
     "cost_estimate": 0
   },
   "scope": "full",
   "grounding": "parametric",
   "derived_from_user_material": false,
-  "integrity": {}
+  "integrity": {
+    "figures/jump-discontinuity.png": "5dc4ca3cc6c25ee8b2fb0eb47e244f2dba6fe6c866b220dca216713cac1c094e",
+    "figures/limit-approach.png": "385968301d2b0e360097d60e033442b66c76897667e56c36a6850793491ebbc9",
+    "items/checkpoint.json": "c4ef0f988769a36c3b49bf5db28f3ab1e33a3f4eed426d61d05de46d35a6fddb",
+    "items/final.json": "c4ef0f988769a36c3b49bf5db28f3ab1e33a3f4eed426d61d05de46d35a6fddb",
+    "items/practice.json": "c4ef0f988769a36c3b49bf5db28f3ab1e33a3f4eed426d61d05de46d35a6fddb",
+    "items/transfer.json": "c4ef0f988769a36c3b49bf5db28f3ab1e33a3f4eed426d61d05de46d35a6fddb",
+    "lessons/L-001.json": "db80fbe470fa7d046873c5a72fba9ee6c41a276b21a33296dc7831e75e113c61",
+    "lessons/L-002.json": "2686127d83241a9b03271ffda3a1c0f3143e88d55a15344ba17ba9885343f0cc",
+    "lessons/L-003.json": "2b10f283344e55b5b1f72a9fce8fe36b6c6823316fbfc9251cc8e7282bc1dad5",
+    "review.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "rubrics/r-001.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "sources.json": "68c2c61c3008badb276cd119d47c60b78a6a51b216580b14be7d35db0ac89949",
+    "spine.json": "871390e1ac968be52670019f6a46dc90eff4f6fa98ad3f0649eba6a5a61d0b9c"
+  }
 }

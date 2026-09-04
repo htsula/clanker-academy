@@ -206,6 +206,15 @@ export type Manifest = z.infer<typeof manifestSchema>
 export type Spine = z.infer<typeof spineSchema>
 export type Atom = z.infer<typeof atomSchema>
 export type WidgetInstance = z.infer<typeof widget>
+export type Figure = z.infer<typeof figure>
+export type Formative = z.infer<typeof formative>
+export type Equation = z.infer<typeof equation>
+export type WorkedExample = z.infer<typeof workedExample>
+export type Callout = z.infer<typeof callout>
+export type Definition = z.infer<typeof definition>
+export type List = z.infer<typeof list>
+export type Paragraph = z.infer<typeof paragraph>
+export type Heading = z.infer<typeof heading>
 
 export function parseBlock(value: unknown): Block {
   return block.parse(value)

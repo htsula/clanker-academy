@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { checkRaster, isRasterImage } from '../course/images'
 import { loadLesson } from '../course/load'
+import { figure as figureSchema, type Figure } from '../course/schema'
 import { FigureBlock } from './FigureBlock'
 
 const pngBytes = new Uint8Array(readFileSync(resolve(__dirname, '../fixtures/figures/limit-approach.png')))
@@ -12,8 +13,8 @@ const svgBytes = new TextEncoder().encode(
   '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
 )
 
-function figureBlock(src: string, caption?: string) {
-  return loadLesson({
+function figureBlock(src: string, caption?: string): Figure {
+  const lesson = loadLesson({
     id: 'L-901',
     title: 'Figures',
     atom_ids: [],
@@ -25,7 +26,8 @@ function figureBlock(src: string, caption?: string) {
         atom_id: 'A-01',
       },
     ],
-  }).blocks[0]
+  })
+  return figureSchema.parse(lesson.blocks[0])
 }
 
 describe('raster image detection', () => {
