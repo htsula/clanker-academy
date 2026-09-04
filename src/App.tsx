@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import clankB64 from './fixtures/course.clank.b64?raw'
-import { base64ToBytes, openClank, type Course } from './course/clank'
+import { openClank, type Course } from './course/clank'
+import { loadCourseBytes } from './course/load-course'
 import { LessonPage } from './renderer/LessonPage'
 
 function CourseView({ course }: { course: Course }) {
@@ -42,7 +42,8 @@ function App() {
 
   useEffect(() => {
     let alive = true
-    openClank(base64ToBytes(clankB64))
+    loadCourseBytes()
+      .then((bytes) => openClank(bytes))
       .then((result) => {
         if (!alive) return
         if (result.ok) setCourse(result.course)

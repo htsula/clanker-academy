@@ -41,13 +41,6 @@ function parse<T>(bytes: Uint8Array | undefined, what: string, parseFn: (v: unkn
   }
 }
 
-export function base64ToBytes(b64: string): Uint8Array {
-  const bin = atob(b64)
-  const bytes = new Uint8Array(bin.length)
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  return bytes
-}
-
 // A course file is a document from a stranger, so opening it is a budgeted
 // operation. The budget reads the central directory — the same structure
 // fflate's unzipSync consumes — so the two cannot be made to disagree the way

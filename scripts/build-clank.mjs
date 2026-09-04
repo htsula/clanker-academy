@@ -59,7 +59,6 @@ for (const [path, data] of Object.entries(files)) {
 
 const clank = zipSync(zipFiles, { level: 9 })
 writeFileSync(join(fixtureRoot, 'course.clank'), clank)
-writeFileSync(join(fixtureRoot, 'course.clank.b64'), Buffer.from(clank).toString('base64'))
 writeFileSync(join(fixtureRoot, 'manifest.json'), JSON.stringify(manifest, null, 2))
 
 console.log(`course.clank written (${clank.length} bytes, ${Object.keys(files).length} files)`)

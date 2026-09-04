@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { strToU8, unzipSync, zipSync } from 'fflate'
 import { describe, expect, it } from 'vitest'
-import { base64ToBytes, computeContentHash, openClank } from '../src/course/clank'
+import { computeContentHash, openClank } from '../src/course/clank'
 import { sha256Hex } from '../src/course/hash'
 
 const fixtureRoot = resolve(__dirname, '../src/fixtures')
@@ -55,13 +55,6 @@ describe('the committed course.clank', () => {
     expect(result.course.lessons.map((l) => l.id)).toEqual(['L-001', 'L-002', 'L-003'])
     expect(result.course.figures.size).toBe(2)
     expect(result.course.manifest.course_id).toBeTruthy()
-  })
-
-  it('round-trips through base64', async () => {
-    const b64 = readFileSync(join(fixtureRoot, 'course.clank.b64'), 'utf8')
-    const fromB64 = base64ToBytes(b64)
-    const result = await openClank(fromB64)
-    expect(result.ok).toBe(true)
   })
 
   it('was packed from exactly the fixture files — no build artifacts inside', () => {
