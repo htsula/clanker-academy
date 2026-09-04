@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { loadLesson } from '../course/load'
 import { LessonPage } from './LessonPage'
 
+const emptyFigures = new Map<string, Uint8Array>()
+
 describe('block renderer', () => {
   it('renders every block type in a lesson', () => {
     const lesson = loadLesson({
@@ -32,7 +34,7 @@ describe('block renderer', () => {
       ],
     })
 
-    const { container } = render(<LessonPage lesson={lesson} />)
+    const { container } = render(<LessonPage lesson={lesson} figures={emptyFigures} />)
 
     expect(screen.getByRole('heading', { name: 'A heading' })).toBeInTheDocument()
     expect(screen.getByText('A paragraph.')).toBeInTheDocument()
@@ -61,7 +63,7 @@ describe('block renderer', () => {
       ],
     })
 
-    render(<LessonPage lesson={lesson} />)
+    render(<LessonPage lesson={lesson} figures={emptyFigures} />)
 
     expect(screen.getByRole('heading', { name: 'Still readable' })).toBeInTheDocument()
     expect(screen.getByText('Still here.')).toBeInTheDocument()
@@ -77,7 +79,7 @@ describe('block renderer', () => {
       blocks: [{ type: 'widget', name: 'evil', version: '1.0', parameters: { html: '<script>alert(1)</script>' } }],
     })
 
-    render(<LessonPage lesson={lesson} />)
+    render(<LessonPage lesson={lesson} figures={emptyFigures} />)
 
     expect(document.body.textContent).not.toContain('<script>')
   })

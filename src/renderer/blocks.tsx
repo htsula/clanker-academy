@@ -1,6 +1,6 @@
-import type { Heading, Paragraph, List, Callout, Definition, WorkedExample, Equation, Figure } from '../course/schema'
+import type { Heading, Paragraph, List, Callout, Definition, WorkedExample, Equation } from '../course/schema'
 import { InlineContent } from './Inline'
-import { DisplayMath } from './InlineMath'
+import { DisplayMath, InlineMath } from './InlineMath'
 
 export function HeadingBlock({ block }: { block: Heading }) {
   const Tag = `h${block.level}` as const
@@ -79,22 +79,5 @@ export function EquationBlock({ block }: { block: Equation }) {
       {block.number ? <span className="equation-number">{block.number}</span> : null}
       {block.display ? <DisplayMath source={block.source} /> : <InlineMath source={block.source} />}
     </div>
-  )
-}
-
-import { InlineMath } from './InlineMath'
-
-export function FigureBlock({ block }: { block: Figure }) {
-  return (
-    <figure className="figure">
-      <div className="figure-frame">
-        <span className="figure-placeholder">figure: {block.src}</span>
-      </div>
-      {block.caption ? (
-        <figcaption>
-          <InlineContent content={block.caption} />
-        </figcaption>
-      ) : null}
-    </figure>
   )
 }

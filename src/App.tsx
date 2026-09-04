@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { fixtureFigures } from './course/fixture-figures'
 import { fixtureLessons, lessonOrder } from './course/fixture-lessons'
 import { LessonPage } from './renderer/LessonPage'
 
@@ -27,7 +28,7 @@ function App() {
           })}
         </ol>
       </nav>
-      {lesson ? <LessonPage key={lesson.id} lesson={lesson} /> : null}
+      {lesson ? <LessonPage key={lesson.id} lesson={lesson} figures={fixtureFigures} /> : null}
     </main>
   )
 }

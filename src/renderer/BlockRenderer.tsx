@@ -3,17 +3,19 @@ import {
   CalloutBlock,
   DefinitionBlock,
   EquationBlock,
-  FigureBlock,
   HeadingBlock,
   ListBlock,
   ParagraphBlock,
   WorkedExampleBlock,
 } from './blocks'
 import { BlockPlaceholder } from './BlockPlaceholder'
+import { FigureBlock } from './FigureBlock'
 import { FormativeBlock } from './FormativeBlock'
 import { WidgetPlaceholder } from './WidgetPlaceholder'
 
-export function BlockRenderer({ block }: { block: RenderableBlock }) {
+export type FigureMap = ReadonlyMap<string, Uint8Array>
+
+export function BlockRenderer({ block, figures }: { block: RenderableBlock; figures: FigureMap }) {
   if ('parseError' in block) {
     return <BlockPlaceholder block={block} />
   }
@@ -33,7 +35,7 @@ export function BlockRenderer({ block }: { block: RenderableBlock }) {
     case 'equation':
       return <EquationBlock block={block} />
     case 'figure':
-      return <FigureBlock block={block} />
+      return <FigureBlock block={block} bytes={figures.get(block.src)} />
     case 'widget':
       return <WidgetPlaceholder block={block} />
     case 'formative':

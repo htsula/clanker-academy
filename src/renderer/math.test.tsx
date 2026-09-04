@@ -11,7 +11,7 @@ function lessonWithMath(blocks: unknown[]) {
 describe('math rendering', () => {
   it('renders a valid display equation with KaTeX', () => {
     const lesson = lessonWithMath([{ type: 'equation', source: 'x^2 + 1', display: true }])
-    const { container } = render(<LessonPage lesson={lesson} />)
+    const { container } = render(<LessonPage lesson={lesson} figures={new Map()} />)
     expect(container.querySelector('.katex')).not.toBeNull()
   })
 
@@ -19,7 +19,7 @@ describe('math rendering', () => {
     const lesson = lessonWithMath([
       { type: 'paragraph', content: [{ type: 'math', source: '\\lim_{x \\to 0} x' }] },
     ])
-    const { container } = render(<LessonPage lesson={lesson} />)
+    const { container } = render(<LessonPage lesson={lesson} figures={new Map()} />)
     expect(container.querySelector('.katex')).not.toBeNull()
   })
 
@@ -29,7 +29,7 @@ describe('math rendering', () => {
       { type: 'equation', source: '\\notarealcommand', display: true },
       { type: 'paragraph', content: [{ type: 'text', text: 'After.' }] },
     ])
-    render(<LessonPage lesson={lesson} />)
+    render(<LessonPage lesson={lesson} figures={new Map()} />)
 
     expect(screen.getByText('Before.')).toBeInTheDocument()
     expect(screen.getByText('After.')).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('math rendering', () => {
       { type: 'equation', source: 'x'.repeat(MATH_SOURCE_MAX + 1), display: true },
       { type: 'paragraph', content: [{ type: 'text', text: 'Still readable.' }] },
     ])
-    render(<LessonPage lesson={lesson} />)
+    render(<LessonPage lesson={lesson} figures={new Map()} />)
 
     expect(screen.getByRole('status')).toHaveTextContent(/length cap/)
     expect(screen.getByText('Still readable.')).toBeInTheDocument()
@@ -50,7 +50,7 @@ describe('math rendering', () => {
   it('refuses an expression over the nesting cap', () => {
     const deep = '\\frac{' + '{'.repeat(MATH_DEPTH_MAX + 1) + 'x' + '}'.repeat(MATH_DEPTH_MAX + 1) + '}'
     const lesson = lessonWithMath([{ type: 'equation', source: deep, display: true }])
-    render(<LessonPage lesson={lesson} />)
+    render(<LessonPage lesson={lesson} figures={new Map()} />)
 
     expect(screen.getByRole('status')).toHaveTextContent(/nesting cap/)
   })
