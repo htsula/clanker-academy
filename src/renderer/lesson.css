@@ -16,15 +16,22 @@
 }
 
 .inline-math {
-  font-family: 'STIX Two Math', 'Cambria Math', serif;
   padding: 0 0.1em;
 }
 
 .display-math {
-  font-family: 'STIX Two Math', 'Cambria Math', serif;
   text-align: center;
   padding: 0.5rem 0;
-  font-size: 1.15rem;
+}
+
+.math-error {
+  display: inline-block;
+  border: 1px solid #c0392b;
+  border-radius: 0.35rem;
+  background: #fdf1f0;
+  color: #6b2b20;
+  font-size: 0.85rem;
+  padding: 0.15rem 0.5rem;
 }
 
 .equation {

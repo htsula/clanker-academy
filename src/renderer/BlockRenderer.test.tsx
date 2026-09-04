@@ -32,7 +32,7 @@ describe('block renderer', () => {
       ],
     })
 
-    render(<LessonPage lesson={lesson} />)
+    const { container } = render(<LessonPage lesson={lesson} />)
 
     expect(screen.getByRole('heading', { name: 'A heading' })).toBeInTheDocument()
     expect(screen.getByText('A paragraph.')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('block renderer', () => {
     expect(screen.getByText('A definition.')).toBeInTheDocument()
     expect(screen.getByText('A problem.')).toBeInTheDocument()
     expect(screen.getByText('A step.')).toBeInTheDocument()
-    expect(screen.getByText('x^2')).toBeInTheDocument()
+    expect(container.querySelector('.katex')).not.toBeNull()
     expect(screen.getByText('A caption.')).toBeInTheDocument()
     expect(screen.getByText('plot@1.0')).toBeInTheDocument()
     expect(screen.getByText('A prompt?')).toBeInTheDocument()

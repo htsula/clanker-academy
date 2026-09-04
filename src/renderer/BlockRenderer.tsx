@@ -14,6 +14,9 @@ import { FormativeBlock } from './FormativeBlock'
 import { WidgetPlaceholder } from './WidgetPlaceholder'
 
 export function BlockRenderer({ block }: { block: RenderableBlock }) {
+  if ('parseError' in block) {
+    return <BlockPlaceholder block={block} />
+  }
   switch (block.type) {
     case 'heading':
       return <HeadingBlock block={block} />
