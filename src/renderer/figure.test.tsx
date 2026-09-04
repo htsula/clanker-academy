@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { checkRaster, isRasterImage } from '../course/images'
 import { loadLesson } from '../course/load'
@@ -8,6 +8,7 @@ import { figure as figureSchema, type Figure } from '../course/schema'
 import { FigureBlock } from './FigureBlock'
 
 const pngBytes = new Uint8Array(readFileSync(resolve(__dirname, '../fixtures/figures/limit-approach.png')))
+const pngBytes2 = new Uint8Array(readFileSync(resolve(__dirname, '../fixtures/figures/jump-discontinuity.png')))
 
 const svgBytes = new TextEncoder().encode(
   '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
@@ -89,5 +90,21 @@ describe('figure rendering', () => {
     render(<FigureBlock block={block} bytes={new Uint8Array([9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9])} />)
     expect(document.querySelector('img')).toBeNull()
     expect(screen.getByRole('status')).toHaveTextContent(/does not decode/)
+  })
+
+  it('resets a decode failure when new bytes arrive', () => {
+    const block = figureBlock('figures/x.png')
+    const { rerender } = render(<FigureBlock block={block} bytes={pngBytes} />)
+
+    const img = document.querySelector('img')
+    expect(img).not.toBeNull()
+    fireEvent.error(img!)
+
+    expect(screen.getByRole('status')).toHaveTextContent(/image failed to decode/)
+    expect(document.querySelector('img')).toBeNull()
+
+    rerender(<FigureBlock block={block} bytes={pngBytes2} />)
+    expect(document.querySelector('img')).not.toBeNull()
+    expect(screen.queryByText(/image failed to decode/)).toBeNull()
   })
 })

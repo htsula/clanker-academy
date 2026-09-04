@@ -4,6 +4,14 @@ import '../course/widgets'
 import { WidgetErrorBoundary } from './WidgetErrorBoundary'
 import { WidgetErrorCard } from './WidgetErrorCard'
 
+// A stable key over the widget instance's inputs. The error boundary is keyed
+// by it so that a change of parameters remounts the boundary fresh — a crash
+// is a latch that must not survive new input (§11.6a: one bad element is a
+// hole, and a later repair is a new element).
+function widgetInputKey(block: WidgetInstance): string {
+  return `${block.name}@${block.version}:${JSON.stringify(block.parameters)}`
+}
+
 export function WidgetBlock({ block }: { block: WidgetInstance }) {
   const resolved = resolveWidget(block.name, block.version, block.parameters)
 
@@ -12,7 +20,7 @@ export function WidgetBlock({ block }: { block: WidgetInstance }) {
       const Comp = resolved.registration.Component
       return (
         <div className="widget">
-          <WidgetErrorBoundary identity={`${block.name}@${block.version}`}>
+          <WidgetErrorBoundary key={widgetInputKey(block)} identity={`${block.name}@${block.version}`}>
             <Comp params={resolved.params} />
           </WidgetErrorBoundary>
         </div>

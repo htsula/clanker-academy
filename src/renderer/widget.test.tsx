@@ -166,6 +166,30 @@ describe('widget rendering', () => {
     expect(screen.getByText('After.')).toBeInTheDocument()
   })
 
+  it('resets the crash latch when the widget input changes', () => {
+    registerWidget({
+      name: 'flaky',
+      major: 1,
+      version: { major: 1, minor: 0 },
+      schema: z.object({ boom: z.boolean().optional() }).strict(),
+      Component: (props) => {
+        if ((props.params as { boom?: boolean }).boom) throw new Error('boom')
+        return <span data-testid="flaky-ok">fine</span>
+      },
+    })
+
+    const { rerender } = render(
+      <WidgetBlock
+        block={{ type: 'widget', name: 'flaky', version: '1.0', parameters: { boom: true } }}
+      />,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent(/crashed while rendering/)
+
+    rerender(<WidgetBlock block={{ type: 'widget', name: 'flaky', version: '1.0', parameters: {} }} />)
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(screen.getByTestId('flaky-ok')).toBeInTheDocument()
+  })
+
   it('rejects a plot range where min >= max at the schema', () => {
     const result = resolveWidget('plot', '1.0', {
       series: [{ points: [[0, 0]] }],
