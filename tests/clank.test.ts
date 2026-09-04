@@ -149,25 +149,61 @@ describe('schema validation at the boundary', () => {
     expect(result).toEqual({ ok: false, reason: 'not a valid zip archive' })
   })
 
-  it('refuses a zip whose declared uncompressed size exceeds the budget', async () => {
-    // A hand-built local file header claiming 80 MB uncompressed. The budget
-    // check must refuse it before anything is decompressed.
-    const header = new Uint8Array(30 + 4)
-    header[0] = 0x50
-    header[1] = 0x4b
-    header[2] = 0x03
-    header[3] = 0x04
-    header[22] = 0x00
-    header[23] = 0x00
-    header[24] = 0x00
-    header[25] = 0x05 // 0x05000000 = 80 MiB
-    header[26] = 4 // name length
-    const name = strToU8('boom')
-    header.set(name, 30)
+  it('refuses a zip whose central directory declares a huge entry — before decompressing', async () => {
+    const files = readFixtures()
+    const clank = await buildClank(files)
 
-    const result = await openClank(header)
+    // Patch the FIRST central directory entry's uncompressed-size field
+    // (offset +24) to 80 MiB, exactly as a zip bomb would. The budget reads
+    // the central directory — the same structure fflate consumes — so it must
+    // refuse here, not hand back a lazy "missing manifest" after decompressing.
+    const tampered = new Uint8Array(clank)
+    const eocd = findEocd(tampered)
+    expect(eocd).toBeGreaterThan(-1)
+    const centralOffset = readU32At(tampered, eocd + 16)
+    tampered[centralOffset + 24] = 0x00
+    tampered[centralOffset + 25] = 0x00
+    tampered[centralOffset + 26] = 0x00
+    tampered[centralOffset + 27] = 0x05 // 0x05000000 = 80 MiB
+
+    const result = await openClank(tampered)
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.reason).toMatch(/exceeds the budget/)
   })
+
+  it('does not trust local file header sizes — zeroing them changes nothing', async () => {
+    const files = readFixtures()
+    const clank = await buildClank(files)
+
+    // Zero the uncompressed-size fields (offsets 18–25) of every local file
+    // header. The old budget saw ~0 and passed; the central directory still
+    // says the truth, so a small honest archive must still open.
+    const tampered = new Uint8Array(clank)
+    for (let i = 0; i + 30 <= tampered.length; i++) {
+      if (
+        tampered[i] === 0x50 &&
+        tampered[i + 1] === 0x4b &&
+        tampered[i + 2] === 0x03 &&
+        tampered[i + 3] === 0x04
+      ) {
+        for (let j = 18; j <= 25; j++) tampered[i + j] = 0
+      }
+    }
+
+    const result = await openClank(tampered)
+    expect(result.ok).toBe(true)
+  })
 })
+
+function findEocd(bytes: Uint8Array): number {
+  const tailStart = Math.max(0, bytes.length - 65557)
+  for (let i = bytes.length - 22; i >= tailStart; i--) {
+    if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) return i
+  }
+  return -1
+}
+
+function readU32At(bytes: Uint8Array, off: number): number {
+  return (bytes[off] | (bytes[off + 1] << 8) | (bytes[off + 2] << 16) | (bytes[off + 3] << 24)) >>> 0
+}

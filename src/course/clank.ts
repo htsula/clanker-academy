@@ -49,34 +49,64 @@ export function base64ToBytes(b64: string): Uint8Array {
 }
 
 // A course file is a document from a stranger, so opening it is a budgeted
-// operation. This scans the local file headers before anything decompresses —
-// fflate's unzipSync would otherwise decompress a zip bomb fully before we
-// could refuse it. Heuristic by nature (data descriptors end the scan early),
-// which is fine: it bounds the common case, and M1's import path owns the real
-// defense.
+// operation. The budget reads the central directory — the same structure
+// fflate's unzipSync consumes — so the two cannot be made to disagree the way
+// a local-header scan could (an attacker can zero the local size fields while
+// the central directory still drives an 80 MB decompression). Sizes are read
+// as unsigned 32-bit; 0xFFFFFFFF is a huge number, never a negative one. ZIP64
+// archives are refused, not approximated: their sentinel values would make any
+// estimate guesswork, and failing closed is the honest behaviour for a guard.
 const MAX_CLANK_ENTRIES = 1000
 const MAX_CLANK_UNCOMPRESSED = 64 * 1024 * 1024
 
+function readU16(bytes: Uint8Array, off: number): number {
+  return (bytes[off] | (bytes[off + 1] << 8)) >>> 0
+}
+
+function readU32(bytes: Uint8Array, off: number): number {
+  return (bytes[off] | (bytes[off + 1] << 8) | (bytes[off + 2] << 16) | (bytes[off + 3] << 24)) >>> 0
+}
+
+function isCentralEntry(bytes: Uint8Array, off: number): boolean {
+  return bytes[off] === 0x50 && bytes[off + 1] === 0x4b && bytes[off + 2] === 0x01 && bytes[off + 3] === 0x02
+}
+
 function zipBudget(bytes: Uint8Array): { ok: true } | { ok: false; reason: string } {
-  let i = 0
+  // The End of Central Directory record (PK\x05\x06) lives within the final
+  // 65,557 bytes per the spec. Walk backwards to find it.
+  const tailStart = Math.max(0, bytes.length - 65557)
+  let eocd = -1
+  for (let i = bytes.length - 22; i >= tailStart; i--) {
+    if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) {
+      eocd = i
+      break
+    }
+  }
+  if (eocd === -1) return { ok: false, reason: 'not a valid zip archive' }
+
+  const totalEntries = readU16(bytes, eocd + 10)
+  const centralSize = readU32(bytes, eocd + 12)
+  const centralOffset = readU32(bytes, eocd + 16)
+  if (totalEntries === 0xffff || centralSize === 0xffffffff || centralOffset === 0xffffffff) {
+    return { ok: false, reason: 'ZIP64 archives are not supported' }
+  }
+
+  let pos = centralOffset
   let entries = 0
   let total = 0
-  const len = bytes.length
-  while (i + 30 <= len) {
-    if (bytes[i] !== 0x50 || bytes[i + 1] !== 0x4b) break
-    const isLocalHeader = bytes[i + 2] === 0x03 && bytes[i + 3] === 0x04
-    if (!isLocalHeader) break
-    const compSize =
-      bytes[i + 18] | (bytes[i + 19] << 8) | (bytes[i + 20] << 16) | (bytes[i + 21] << 24)
-    const uncompSize =
-      bytes[i + 22] | (bytes[i + 23] << 8) | (bytes[i + 24] << 16) | (bytes[i + 25] << 24)
-    const nameLen = bytes[i + 26] | (bytes[i + 27] << 8)
-    const extraLen = bytes[i + 28] | (bytes[i + 29] << 8)
+  while (entries < totalEntries) {
+    if (pos + 46 > bytes.length || !isCentralEntry(bytes, pos)) {
+      return { ok: false, reason: 'not a valid zip archive' }
+    }
+    const uncompressed = readU32(bytes, pos + 24)
+    const nameLen = readU16(bytes, pos + 28)
+    const extraLen = readU16(bytes, pos + 30)
+    const commentLen = readU16(bytes, pos + 32)
     entries += 1
-    total += uncompSize
+    total += uncompressed
     if (entries > MAX_CLANK_ENTRIES) return { ok: false, reason: 'archive has too many entries' }
     if (total > MAX_CLANK_UNCOMPRESSED) return { ok: false, reason: 'archive uncompressed size exceeds the budget' }
-    i += 30 + nameLen + extraLen + compSize
+    pos += 46 + nameLen + extraLen + commentLen
   }
   return { ok: true }
 }
