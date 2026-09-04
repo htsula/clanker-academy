@@ -1,0 +1,11 @@
+{
+  "sources": [
+    {
+      "kind": "textbook",
+      "title": "Stewart, Calculus: Early Transcendentals, 8th ed.",
+      "chapters": ["Ch. 2 — Limits and Derivatives"],
+      "provenance": "parametric",
+      "derived_from_user_material": false
+    }
+  ]
+}

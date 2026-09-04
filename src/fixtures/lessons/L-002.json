@@ -1,0 +1,201 @@
+{
+  "id": "L-002",
+  "title": "Computing Limits",
+  "atom_ids": ["A-02"],
+  "blocks": [
+    {
+      "type": "heading",
+      "level": 1,
+      "content": [{ "type": "text", "text": "Computing Limits" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Most limits are computed by substitution. The algebraic rules for limits make this legitimate: the limit of a sum is the sum of the limits, and the same holds for products, quotients, and powers — provided the pieces actually have limits and, for a quotient, the denominator does not approach zero."
+        }
+      ]
+    },
+    {
+      "type": "equation",
+      "source": "\\lim_{x \\to a} \\big(f(x) + g(x)\\big) = \\lim_{x \\to a} f(x) + \\lim_{x \\to a} g(x)",
+      "display": true,
+      "number": "(2)"
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "So for a polynomial, substitution always works: plug in "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " and you are done. The interesting cases are quotients where substitution produces "
+        },
+        { "type": "math", "source": "0/0" },
+        {
+          "type": "text",
+          "text": ". That form is called indeterminate — it tells you nothing yet — and the standard move is to simplify the fraction algebraically and try substitution again."
+        }
+      ]
+    },
+    {
+      "type": "worked-example",
+      "title": "A limit at a hole",
+      "problem": [
+        {
+          "type": "text",
+          "text": "Compute "
+        },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to -2} \\dfrac{x^2 - 4}{x + 2}"
+        },
+        { "type": "text", "text": "." }
+      ],
+      "solution": [
+        [
+          {
+            "type": "text",
+            "text": "Substitute "
+          },
+          { "type": "math", "source": "x = -2" },
+          {
+            "type": "text",
+            "text": " to see the form: "
+          },
+          { "type": "math", "source": "\\dfrac{4 - 4}{0} = \\dfrac{0}{0}" },
+          { "type": "text", "text": ", indeterminate." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Factor the numerator: "
+          },
+          {
+            "type": "math",
+            "source": "x^2 - 4 = (x - 2)(x + 2)"
+          },
+          {
+            "type": "text",
+            "text": ", so for "
+          },
+          { "type": "math", "source": "x \\neq -2" },
+          {
+            "type": "text",
+            "text": " the fraction simplifies to "
+          },
+          { "type": "math", "source": "x - 2" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The limit ignores the point "
+          },
+          { "type": "math", "source": "x = -2" },
+          {
+            "type": "text",
+            "text": " itself, so substituting into the simplified form is valid: "
+          },
+          {
+            "type": "math",
+            "source": "\\lim_{x \\to -2} (x - 2) = -4"
+          },
+          { "type": "text", "text": "." }
+        ]
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        [
+          {
+            "type": "text",
+            "text": "Substitute first. If you get a real number, that is the limit."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "If you get "
+          },
+          { "type": "math", "source": "0/0" },
+          {
+            "type": "text",
+            "text": ", simplify the expression — factor, cancel, or combine fractions — and substitute again."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "If the denominator alone goes to zero, the limit may be infinite or may not exist; investigate the sign on each side."
+          }
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "kind": "warning",
+      "content": [
+        {
+          "type": "text",
+          "text": "A "
+        },
+        { "type": "math", "source": "0/0" },
+        {
+          "type": "text",
+          "text": " form means the limit might be anything — 0, 4, "
+        },
+        { "type": "math", "source": "-4" },
+        {
+          "type": "text",
+          "text": ", or undefined. Never report the form itself as an answer."
+        }
+      ]
+    },
+    {
+      "type": "widget",
+      "name": "plot",
+      "version": "1.0",
+      "parameters": {
+        "series": [
+          {
+            "label": "f(x) = (x^2 - 4)/(x + 2)",
+            "points": [
+              [-4.0, -6.0], [-3.5, -5.5], [-3.0, -5.0], [-2.5, -4.5],
+              [-2.2, -4.2], [-2.05, -4.05],
+              [-1.95, -3.95], [-1.8, -3.8],
+              [-1.5, -3.5], [-1.0, -3.0], [-0.5, -2.5], [0.0, -2.0]
+            ]
+          }
+        ],
+        "xlabel": "x",
+        "ylabel": "y",
+        "title": "The hole at x = -2, limit -4"
+      }
+    },
+    {
+      "type": "formative",
+      "prompt": [
+        {
+          "type": "text",
+          "text": "Compute "
+        },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to 4} \\dfrac{x - 4}{\\sqrt{x} - 2}"
+        },
+        {
+          "type": "text",
+          "text": " and give the reasoning in one or two sentences."
+        }
+      ],
+      "kind": "free_response"
+    }
+  ]
+}

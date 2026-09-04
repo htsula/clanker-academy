@@ -1,0 +1,28 @@
+{
+  "course_id": "7f3a9b1e-2c4d-4e5f-8a9b-0c1d2e3f4a5b",
+  "version": 1,
+  "content_hash": "computed-by-build-clank",
+  "title": "Introduction to Limits and Continuity",
+  "subject": "Calculus",
+  "level": "First-year undergraduate",
+  "hours_estimate": 6,
+  "prereq_courses": ["College Algebra"],
+  "prereq_atoms": [],
+  "generator": {
+    "harness_version": "0.0.0-m0",
+    "pipeline": [
+      { "stage": "charter", "config": {} },
+      { "stage": "spine", "config": {} },
+      { "stage": "instruction", "config": {} },
+      { "stage": "package", "config": {} }
+    ],
+    "models": { "instruction": "hand-authored" },
+    "generated_at": "2026-09-03T00:00:00Z",
+    "tokens": { "instruction": { "in": 0, "out": 0 } },
+    "cost_estimate": 0
+  },
+  "scope": "full",
+  "grounding": "parametric",
+  "derived_from_user_material": false,
+  "integrity": {}
+}

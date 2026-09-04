@@ -1,0 +1,35 @@
+{
+  "subject": "Calculus",
+  "review_cap_minutes": 36,
+  "modules": [
+    {
+      "id": "M-01",
+      "title": "Limits and Continuity",
+      "lessons": [
+        { "id": "L-001", "title": "The Idea of a Limit", "atoms": ["A-01"] },
+        { "id": "L-002", "title": "Computing Limits", "atoms": ["A-02"] },
+        { "id": "L-003", "title": "Continuity", "atoms": ["A-03"] }
+      ]
+    }
+  ],
+  "atoms": [
+    {
+      "id": "A-01",
+      "objective": "Define the limit of a function at a point informally and read it from a graph.",
+      "bloom": "understand",
+      "prereq_atoms": []
+    },
+    {
+      "id": "A-02",
+      "objective": "Compute limits of polynomial and rational functions by algebraic simplification, including limits at a hole.",
+      "bloom": "apply",
+      "prereq_atoms": ["A-01"]
+    },
+    {
+      "id": "A-03",
+      "objective": "State the definition of continuity at a point and determine where a function is continuous from its formula or graph.",
+      "bloom": "understand",
+      "prereq_atoms": ["A-01"]
+    }
+  ]
+}
