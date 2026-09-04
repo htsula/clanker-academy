@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { Figure } from '../course/schema'
 import { bytesToObjectUrl, checkRaster, revokeObjectUrl } from '../course/images'
 import { InlineContent } from './Inline'
@@ -18,14 +18,11 @@ export function FigureBlock({ block, bytes }: { block: Figure; bytes?: Uint8Arra
     return bytesToObjectUrl(bytes!)
   }, [check, bytes])
 
-  const urlRef = useRef<string | null>(null)
-  urlRef.current = objectUrl
-
   useEffect(() => {
     return () => {
-      if (urlRef.current) revokeObjectUrl(urlRef.current)
+      if (objectUrl) revokeObjectUrl(objectUrl)
     }
-  }, [])
+  }, [objectUrl])
 
   const caption = block.caption ? (
     <figcaption>
