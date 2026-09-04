@@ -4,13 +4,13 @@ import { describe, expect, it } from 'vitest'
 
 const root = resolve(__dirname, '..')
 
-function readJson(relative: string): any {
+function readJson(relative: string): unknown {
   return JSON.parse(readFileSync(resolve(root, relative), 'utf8'))
 }
 
 describe('Tauri security config (D9 config assertion)', () => {
   it('allowlists exactly the expected capabilities', () => {
-    const caps = readJson('src-tauri/capabilities/default.json')
+    const caps = readJson('src-tauri/capabilities/default.json') as { permissions: string[] }
     expect(caps.permissions).toEqual(['core:default'])
   })
 
@@ -24,13 +24,16 @@ describe('Tauri security config (D9 config assertion)', () => {
   })
 
   it('registers no plugins', () => {
-    const config = readJson('src-tauri/tauri.conf.json')
-    expect(config.app.plugins).toBeUndefined()
+    const config = readJson('src-tauri/tauri.conf.json') as Record<string, unknown>
+    const app = config.app as Record<string, unknown>
+    expect(app.plugins).toBeUndefined()
     expect(config.plugins).toBeUndefined()
   })
 
   it('sets a strict CSP with no remote connect and no inline script', () => {
-    const config = readJson('src-tauri/tauri.conf.json')
+    const config = readJson('src-tauri/tauri.conf.json') as {
+      app: { security: { csp: string } }
+    }
     const csp = config.app.security.csp
     expect(typeof csp).toBe('string')
 
