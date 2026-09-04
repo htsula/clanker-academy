@@ -163,6 +163,93 @@
   font-weight: 700;
 }
 
+.widget-error-card {
+  border: 1px solid #c0392b;
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: baseline;
+  background: #fdf1f0;
+  color: #6b2b20;
+  font-size: 0.85rem;
+}
+
+.widget-error-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+.widget-error-identity {
+  font-family: ui-monospace, Consolas, monospace;
+  font-weight: 600;
+}
+
+.widget-error-versions {
+  color: #8a4b40;
+}
+
+.widget {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+.plot-widget {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.plot-title {
+  font-size: 13px;
+  font-weight: 600;
+  fill: #333;
+}
+
+.plot-tick {
+  font-size: 10px;
+  fill: #666;
+}
+
+.plot-axis {
+  stroke: #999;
+  stroke-width: 1;
+}
+
+.plot-axis-label {
+  font-size: 11px;
+  fill: #333;
+}
+
+.plot-legend {
+  font-size: 10px;
+  fill: #444;
+}
+
+.plot-series {
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.plot-series-0 {
+  stroke: #1a73e8;
+}
+
+.plot-series-1 {
+  stroke: #d93025;
+}
+
+.plot-series-2 {
+  stroke: #188038;
+}
+
 .formative {
   border-top: 2px solid #e5e8ec;
   border-bottom: 2px solid #e5e8ec;

@@ -11,7 +11,7 @@ import {
 import { BlockPlaceholder } from './BlockPlaceholder'
 import { FigureBlock } from './FigureBlock'
 import { FormativeBlock } from './FormativeBlock'
-import { WidgetPlaceholder } from './WidgetPlaceholder'
+import { WidgetBlock } from './WidgetBlock'
 
 export type FigureMap = ReadonlyMap<string, Uint8Array>
 
@@ -37,7 +37,7 @@ export function BlockRenderer({ block, figures }: { block: RenderableBlock; figu
     case 'figure':
       return <FigureBlock block={block} bytes={figures.get(block.src)} />
     case 'widget':
-      return <WidgetPlaceholder block={block} />
+      return <WidgetBlock block={block} />
     case 'formative':
       return <FormativeBlock block={block} />
     default:

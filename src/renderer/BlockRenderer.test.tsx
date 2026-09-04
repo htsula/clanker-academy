@@ -24,7 +24,12 @@ describe('block renderer', () => {
         },
         { type: 'equation', source: 'x^2', display: true },
         { type: 'figure', src: 'figures/x.png', caption: [{ type: 'text', text: 'A caption.' }] },
-        { type: 'widget', name: 'plot', version: '1.0', parameters: {} },
+        {
+          type: 'widget',
+          name: 'plot',
+          version: '1.0',
+          parameters: { series: [{ label: 's', points: [[0, 0], [1, 1]] }] },
+        },
         {
           type: 'formative',
           prompt: [{ type: 'text', text: 'A prompt?' }],
@@ -46,7 +51,7 @@ describe('block renderer', () => {
     expect(screen.getByText('A step.')).toBeInTheDocument()
     expect(container.querySelector('.katex')).not.toBeNull()
     expect(screen.getByText('A caption.')).toBeInTheDocument()
-    expect(screen.getByText('plot@1.0')).toBeInTheDocument()
+    expect(container.querySelector('.plot-widget')).not.toBeNull()
     expect(screen.getByText('A prompt?')).toBeInTheDocument()
     expect(screen.getByText('yes')).toBeInTheDocument()
   })
