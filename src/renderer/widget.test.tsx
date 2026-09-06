@@ -190,6 +190,26 @@ describe('widget rendering', () => {
     expect(screen.getByTestId('flaky-ok')).toBeInTheDocument()
   })
 
+  it('keeps the legend inside the SVG frame even with five labelled series', () => {
+    const series = Array.from({ length: 5 }, (_, i) => ({
+      label: `series ${i + 1}`,
+      points: [[i, 0], [i + 1, 1]] as [number, number][],
+    }))
+    const { container } = render(<PlotWidget params={{ series }} />)
+    const svg = container.querySelector('svg')
+    const viewBox = svg?.getAttribute('viewBox')?.split(' ').map(Number) ?? [0, 0, 480, 320]
+    const [, , vbW, vbH] = viewBox
+    const legendTexts = Array.from(container.querySelectorAll('text.plot-legend'))
+    for (const text of legendTexts) {
+      const y = Number(text.getAttribute('y'))
+      expect(y, 'legend row must render inside the frame').toBeLessThan(vbH)
+      const x = Number(text.getAttribute('x'))
+      expect(x, 'legend row must render inside the frame width').toBeGreaterThanOrEqual(0)
+      expect(x, 'legend row must render inside the frame width').toBeLessThan(vbW)
+    }
+    expect(legendTexts.length).toBe(5)
+  })
+
   it('rejects a plot range where min >= max at the schema', () => {
     const result = resolveWidget('plot', '1.0', {
       series: [{ points: [[0, 0]] }],

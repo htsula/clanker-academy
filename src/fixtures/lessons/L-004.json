@@ -1,0 +1,230 @@
+{
+  "id": "L-004",
+  "title": "Harder Limits: Conjugates and Common Denominators",
+  "atom_ids": ["A-04"],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Factoring handles the "
+        },
+        { "type": "math", "source": "0/0" },
+        {
+          "type": "text",
+          "text": " cases where the numerator and denominator share a polynomial factor. Two other algebraic moves cover most of what remains: multiplying by a conjugate to clear a radical, and combining a compound fraction."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Rationalizing with a conjugate" }
+      ]
+    },
+    {
+      "type": "worked-example",
+      "title": "The conjugate move",
+      "problem": [
+        {
+          "type": "text",
+          "text": "Compute "
+        },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to 4} \\dfrac{\\sqrt{x} - 2}{x - 4}"
+        },
+        { "type": "text", "text": "." }
+      ],
+      "solution": [
+        [
+          {
+            "type": "text",
+            "text": "Substitution gives "
+          },
+          { "type": "math", "source": "\\dfrac{\\sqrt{4} - 2}{0} = \\dfrac{0}{0}" },
+          { "type": "text", "text": ", indeterminate." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Multiply numerator and denominator by the conjugate "
+          },
+          { "type": "math", "source": "\\sqrt{x} + 2" },
+          {
+            "type": "text",
+            "text": ". The numerator becomes "
+          },
+          { "type": "math", "source": "(\\sqrt{x})^2 - 2^2 = x - 4" },
+          {
+            "type": "text",
+            "text": ", so the fraction is "
+          },
+          { "type": "math", "source": "\\dfrac{x - 4}{(x - 4)(\\sqrt{x} + 2)}" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The factor "
+          },
+          { "type": "math", "source": "x - 4" },
+          {
+            "type": "text",
+            "text": " is only zero at "
+          },
+          { "type": "math", "source": "x = 4" },
+          {
+            "type": "text",
+            "text": ", which the limit ignores, so it cancels: "
+          },
+          { "type": "math", "source": "\\dfrac{1}{\\sqrt{x} + 2}" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Substitute "
+          },
+          { "type": "math", "source": "x = 4" },
+          { "type": "text", "text": ": " },
+          { "type": "math", "source": "\\dfrac{1}{\\sqrt{4} + 2} = \\dfrac{1}{4}" },
+          { "type": "text", "text": "." }
+        ]
+      ]
+    },
+    {
+      "type": "widget",
+      "name": "plot",
+      "version": "1.0",
+      "parameters": {
+        "series": [
+          {
+            "label": "f(x) = (sqrt(x) - 2)/(x - 4)",
+            "points": [
+              [2.0, 0.2929], [2.5, 0.2793], [3.0, 0.2679], [3.5, 0.2583],
+              [3.9, 0.2516], [4.1, 0.2485], [4.5, 0.2426], [5.0, 0.2361],
+              [6.0, 0.2247], [7.0, 0.2153]
+            ]
+          }
+        ],
+        "xlabel": "x",
+        "ylabel": "y",
+        "title": "The hole at x = 4, limit 1/4"
+      }
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Combining a compound fraction" }
+      ]
+    },
+    {
+      "type": "worked-example",
+      "title": "A compound fraction",
+      "problem": [
+        {
+          "type": "text",
+          "text": "Compute "
+        },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to 0} \\dfrac{\\frac{1}{x + 2} - \\frac{1}{2}}{x}"
+        },
+        { "type": "text", "text": "." }
+      ],
+      "solution": [
+        [
+          {
+            "type": "text",
+            "text": "Substitution gives "
+          },
+          { "type": "math", "source": "\\dfrac{\\frac{1}{2} - \\frac{1}{2}}{0} = \\dfrac{0}{0}" },
+          { "type": "text", "text": ", indeterminate." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Combine the numerator over the common denominator "
+          },
+          { "type": "math", "source": "2(x + 2)" },
+          { "type": "text", "text": ": " },
+          {
+            "type": "math",
+            "source": "\\dfrac{1}{x + 2} - \\dfrac{1}{2} = \\dfrac{2 - (x + 2)}{2(x + 2)} = \\dfrac{-x}{2(x + 2)}"
+          },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The quotient becomes "
+          },
+          {
+            "type": "math",
+            "source": "\\dfrac{-x}{2(x + 2)} \\div x = \\dfrac{-1}{2(x + 2)}"
+          },
+          {
+            "type": "text",
+            "text": " after cancelling the factor "
+          },
+          { "type": "math", "source": "x" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Substitute "
+          },
+          { "type": "math", "source": "x = 0" },
+          { "type": "text", "text": ": " },
+          { "type": "math", "source": "\\dfrac{-1}{2(0 + 2)} = -\\dfrac{1}{4}" },
+          { "type": "text", "text": "." }
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "kind": "warning",
+      "content": [
+        {
+          "type": "text",
+          "text": "Every cancellation in this lesson is legal only because a limit never evaluates at the point: throughout the approach, "
+        },
+        { "type": "math", "source": "x \\neq a" },
+        {
+          "type": "text",
+          "text": ". You are cancelling the factor — "
+        },
+        { "type": "math", "source": "x - 4" },
+        { "type": "text", "text": " in the first example, " },
+        { "type": "math", "source": "x" },
+        {
+          "type": "text",
+          "text": " in the second — and the fact that it is zero at the limit point is exactly why it can be cancelled."
+        }
+      ]
+    },
+    {
+      "type": "formative",
+      "prompt": [
+        {
+          "type": "text",
+          "text": "Compute "
+        },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to 0} \\dfrac{\\sqrt{1 + x} - 1}{x}"
+        },
+        {
+          "type": "text",
+          "text": " using a conjugate. Give the value and name each algebraic move you made."
+        }
+      ],
+      "kind": "free_response"
+    }
+  ]
+}

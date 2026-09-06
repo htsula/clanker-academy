@@ -232,6 +232,13 @@
   fill: #444;
 }
 
+.plot-legend-backdrop {
+  fill: #fff;
+  fill-opacity: 0.88;
+  stroke: #e3e6ea;
+  stroke-width: 1;
+}
+
 .plot-series {
   stroke-width: 2;
   stroke-linejoin: round;

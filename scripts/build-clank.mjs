@@ -3,7 +3,6 @@ import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, writeFileSync, statSync } from 'node:fs'
 import { resolve, dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { collectWidgets } from '../src/course/widgets-used.mjs'
 
 // Packages src/fixtures/ into a real .clank (scripts/build-clank.mjs), the
 // container layout of §3.1. Hash format must match src/course/clank.ts:
@@ -53,13 +52,27 @@ const manifest = JSON.parse(new TextDecoder().decode(files['manifest.json']))
 manifest.integrity = integrity
 manifest.content_hash = contentHash
 
-// widgets_used[] is collected from the lesson trees — never hand-edited, never
-// generated. The walk is the shared module the runtime registry re-exports.
+// widgets_used[] is collected from the lesson and item trees — never
+// hand-edited, never generated. The walk is the shared module the runtime
+// registry re-exports (§11.6a: gathered by walking the lesson and item trees
+// at Stage 7). Items carry widgets under each item's own shape, so a
+// recursive descent over every JSON container covers both.
 const widgetsUsed = new Set()
+function walkBlocks(node) {
+  if (!node || typeof node !== 'object') return
+  if (Array.isArray(node)) {
+    for (const child of node) walkBlocks(child)
+    return
+  }
+  if (node.type === 'widget') {
+    widgetsUsed.add(`${node.name}@${node.version}`)
+  }
+  for (const value of Object.values(node)) walkBlocks(value)
+}
 for (const [path, data] of Object.entries(files)) {
-  if (!path.startsWith('lessons/') || !path.endsWith('.json')) continue
-  const lesson = JSON.parse(new TextDecoder().decode(data))
-  for (const w of collectWidgets(lesson.blocks ?? [])) widgetsUsed.add(`${w.name}@${w.version}`)
+  if (!path.startsWith('lessons/') && !path.startsWith('items/')) continue
+  if (!path.endsWith('.json')) continue
+  walkBlocks(JSON.parse(new TextDecoder().decode(data)))
 }
 manifest.widgets_used = [...widgetsUsed].sort()
 

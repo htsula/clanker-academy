@@ -118,6 +118,54 @@ function viewport(w, h, margin, xmin, xmax, ymin, ymax) {
   return { fx, fy }
 }
 
+// Dashed line: step along the segment in pixel space, alternating on/off runs.
+function dash(c, x0, y0, x1, y1, color, on = 8, off = 6) {
+  const dx = x1 - x0
+  const dy = y1 - y0
+  const len = Math.hypot(dx, dy)
+  if (len === 0) return
+  const ux = dx / len
+  const uy = dy / len
+  let d = 0
+  let draw = true
+  while (d < len) {
+    const run = Math.min(draw ? on : off, len - d)
+    if (draw) c.line(x0 + ux * d, y0 + uy * d, x0 + ux * (d + run), y0 + uy * (d + run), color)
+    d += run
+    draw = !draw
+  }
+}
+
+// Arrow: a shaft plus a two-segment head at the tip, drawn toward (x1, y1).
+function arrow(c, x0, y0, x1, y1, color, head = 8) {
+  c.line(x0, y0, x1, y1, color)
+  const dx = x1 - x0
+  const dy = y1 - y0
+  const len = Math.hypot(dx, dy)
+  if (len === 0) return
+  const ux = dx / len
+  const uy = dy / len
+  const back = Math.min(head, len * 0.6)
+  const bx = x1 - ux * back
+  const by = y1 - uy * back
+  const perp = head * 0.45
+  c.line(x1, y1, bx - uy * perp, by + ux * perp, color)
+  c.line(x1, y1, bx + uy * perp, by - ux * perp, color)
+}
+
+// Sample a function and draw it as a polyline; points outside the viewport
+// are clipped per segment so the curve stays continuous at the frame edge.
+function curve(c, v, f, xmin, xmax, n, color) {
+  let prev = null
+  for (let i = 0; i <= n; i++) {
+    const x = xmin + ((xmax - xmin) * i) / n
+    const px = v.fx(x)
+    const py = v.fy(f(x))
+    if (prev) c.line(prev[0], prev[1], px, py, color)
+    prev = [px, py]
+  }
+}
+
 function drawAxes(c, v, xmin, xmax, ymin, ymax, ticks) {
   const x0 = v.fx(0)
   const y0 = v.fy(0)
@@ -186,6 +234,70 @@ function jumpDiscontinuity() {
   writeFileSync(resolve(outDir, 'jump-discontinuity.png'), img)
 }
 
+function oneSidedLimits() {
+  const w = 560
+  const h = 360
+  const c = newCanvas(w, h)
+  const v = viewport(w, h, 44, -0.5, 4.5, -0.5, 5.5)
+  drawAxes(c, v, -0.5, 4.5, -0.5, 5.5, { x: [-1, 0, 1, 2, 3, 4], y: [-1, 0, 1, 2, 3, 4, 5] })
+  curve(c, v, (x) => x * x, 0.4, 3.6, 120, CURVE)
+  const onCurve = (x) => v.fy(x * x)
+  // Approach trails on each side, arrowheads pointing at (2, 4).
+  arrow(c, v.fx(1.2), onCurve(1.2), v.fx(1.95), onCurve(1.95), FILL)
+  arrow(c, v.fx(2.8), onCurve(2.8), v.fx(2.05), onCurve(2.05), FILL)
+  c.circle(v.fx(2), v.fy(4), 5, CURVE, true)
+  const img = makePng(w, h, c.px)
+  writeFileSync(resolve(outDir, 'one-sided-limits.png'), img)
+}
+
+function intermediateValue() {
+  const w = 560
+  const h = 360
+  const c = newCanvas(w, h)
+  const v = viewport(w, h, 44, 0.2, 2.8, -2.2, 6.2)
+  drawAxes(c, v, 0.2, 2.8, -2.2, 6.2, { x: [0, 1, 2, 3], y: [-2, -1, 0, 1, 2, 3, 4, 5, 6] })
+  dash(c, v.fx(0.2), v.fy(0), v.fx(2.8), v.fy(0), AXIS)
+  curve(c, v, (x) => x * x * x - x - 1, 1, 2, 120, CURVE)
+  c.circle(v.fx(1), v.fy(-1), 5, CURVE, true)
+  c.circle(v.fx(2), v.fy(5), 5, CURVE, true)
+  c.circle(v.fx(1.3247), v.fy(0), 5, INK, true)
+  const img = makePng(w, h, c.px)
+  writeFileSync(resolve(outDir, 'ivt.png'), img)
+}
+
+function horizontalAsymptote() {
+  const w = 560
+  const h = 360
+  const c = newCanvas(w, h)
+  const v = viewport(w, h, 44, -1.5, 11.5, -6.5, 10.5)
+  drawAxes(c, v, -1.5, 11.5, -6.5, 10.5, {
+    x: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    y: [-6, -4, -2, 0, 2, 4, 6, 8, 10],
+  })
+  dash(c, v.fx(-1.5), v.fy(2), v.fx(11.5), v.fy(2), AXIS)
+  curve(c, v, (x) => (2 * x + 1) / (x - 1), 1.12, 11.5, 160, CURVE)
+  curve(c, v, (x) => (2 * x + 1) / (x - 1), -1.5, 0.88, 160, CURVE)
+  const img = makePng(w, h, c.px)
+  writeFileSync(resolve(outDir, 'horizontal-asymptote.png'), img)
+}
+
+function verticalAsymptote() {
+  const w = 560
+  const h = 360
+  const c = newCanvas(w, h)
+  const v = viewport(w, h, 44, -2.5, 6.5, -5.5, 5.5)
+  drawAxes(c, v, -2.5, 6.5, -5.5, 5.5, { x: [-2, -1, 0, 1, 2, 3, 4, 5, 6], y: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5] })
+  dash(c, v.fx(2), v.fy(-5.5), v.fx(2), v.fy(5.5), AXIS)
+  curve(c, v, (x) => 1 / (x - 2), -2.5, 1.82, 160, CURVE)
+  curve(c, v, (x) => 1 / (x - 2), 2.18, 6.5, 160, CURVE)
+  const img = makePng(w, h, c.px)
+  writeFileSync(resolve(outDir, 'vertical-asymptote.png'), img)
+}
+
 limitApproach()
 jumpDiscontinuity()
+oneSidedLimits()
+intermediateValue()
+horizontalAsymptote()
+verticalAsymptote()
 console.log('figures written to', outDir)

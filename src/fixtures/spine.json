@@ -4,11 +4,35 @@
   "modules": [
     {
       "id": "M-01",
-      "title": "Limits and Continuity",
+      "title": "The Concept of a Limit",
       "lessons": [
         { "id": "L-001", "title": "The Idea of a Limit", "atoms": ["A-01"] },
-        { "id": "L-002", "title": "Computing Limits", "atoms": ["A-02"] },
-        { "id": "L-003", "title": "Continuity", "atoms": ["A-03"] }
+        { "id": "L-002", "title": "One-Sided Limits and When a Limit Exists", "atoms": ["A-02"] },
+        { "id": "L-003", "title": "Computing Limits", "atoms": ["A-03"] },
+        { "id": "L-004", "title": "Harder Limits: Conjugates and Common Denominators", "atoms": ["A-04"] }
+      ]
+    },
+    {
+      "id": "M-02",
+      "title": "Continuity",
+      "lessons": [
+        { "id": "L-005", "title": "Continuity at a Point", "atoms": ["A-05"] },
+        { "id": "L-006", "title": "The Intermediate Value Theorem", "atoms": ["A-06"] }
+      ]
+    },
+    {
+      "id": "M-03",
+      "title": "Limits at Infinity and Asymptotes",
+      "lessons": [
+        { "id": "L-007", "title": "Limits at Infinity and Horizontal Asymptotes", "atoms": ["A-07"] },
+        { "id": "L-008", "title": "Infinite Limits and Vertical Asymptotes", "atoms": ["A-08"] }
+      ]
+    },
+    {
+      "id": "M-04",
+      "title": "The Precise Definition",
+      "lessons": [
+        { "id": "L-009", "title": "The Precise Definition of a Limit", "atoms": ["A-09"] }
       ]
     }
   ],
@@ -21,15 +45,51 @@
     },
     {
       "id": "A-02",
+      "objective": "Define one-sided limits and use the existence test: a two-sided limit exists exactly when both one-sided limits exist and agree.",
+      "bloom": "understand",
+      "prereq_atoms": ["A-01"]
+    },
+    {
+      "id": "A-03",
       "objective": "Compute limits of polynomial and rational functions by algebraic simplification, including limits at a hole.",
       "bloom": "apply",
       "prereq_atoms": ["A-01"]
     },
     {
-      "id": "A-03",
+      "id": "A-04",
+      "objective": "Compute limits with indeterminate 0/0 forms by rationalizing with a conjugate and by combining compound fractions.",
+      "bloom": "apply",
+      "prereq_atoms": ["A-03"]
+    },
+    {
+      "id": "A-05",
       "objective": "State the definition of continuity at a point and determine where a function is continuous from its formula or graph.",
       "bloom": "understand",
-      "prereq_atoms": ["A-01"]
+      "prereq_atoms": ["A-01", "A-02"]
+    },
+    {
+      "id": "A-06",
+      "objective": "State and apply the intermediate value theorem to prove the existence of roots and intermediate values.",
+      "bloom": "apply",
+      "prereq_atoms": ["A-05"]
+    },
+    {
+      "id": "A-07",
+      "objective": "Evaluate limits at infinity for rational functions and identify horizontal asymptotes from end behaviour.",
+      "bloom": "understand",
+      "prereq_atoms": ["A-03"]
+    },
+    {
+      "id": "A-08",
+      "objective": "Analyse infinite limits by sign and identify vertical asymptotes, distinguishing divergence from a limit.",
+      "bloom": "understand",
+      "prereq_atoms": ["A-03"]
+    },
+    {
+      "id": "A-09",
+      "objective": "State the epsilon-delta definition of a limit and prove a linear limit by constructing delta in terms of epsilon.",
+      "bloom": "analyze",
+      "prereq_atoms": ["A-02", "A-03"]
     }
   ]
 }

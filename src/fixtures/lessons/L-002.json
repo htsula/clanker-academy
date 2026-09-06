@@ -1,6 +1,6 @@
 {
   "id": "L-002",
-  "title": "Computing Limits",
+  "title": "One-Sided Limits and When a Limit Exists",
   "atom_ids": ["A-02"],
   "blocks": [
     {
@@ -8,148 +8,131 @@
       "content": [
         {
           "type": "text",
-          "text": "Most limits are computed by substitution. The algebraic rules for limits make this legitimate: the limit of a sum is the sum of the limits, and the same holds for products, quotients, and powers — provided the pieces actually have limits and, for a quotient, the denominator does not approach zero."
+          "text": "The limit in L-001 was about approach from both sides at once. But a function can behave differently on the two sides of a point, and it is worth being able to say what happens from each side separately. That is what one-sided limits do."
+        }
+      ]
+    },
+    {
+      "type": "definition",
+      "term": "One-sided limits",
+      "content": [
+        {
+          "type": "text",
+          "text": "We write "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a^-} f(x) = L" },
+        {
+          "type": "text",
+          "text": " and say the left-hand limit is "
+        },
+        { "type": "math", "source": "L" },
+        {
+          "type": "text",
+          "text": " when the values of "
+        },
+        { "type": "math", "source": "f(x)" },
+        {
+          "type": "text",
+          "text": " get arbitrarily close to "
+        },
+        { "type": "math", "source": "L" },
+        {
+          "type": "text",
+          "text": " as "
+        },
+        { "type": "math", "source": "x" },
+        {
+          "type": "text",
+          "text": " approaches "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " from the left, meaning "
+        },
+        { "type": "math", "source": "x < a" },
+        {
+          "type": "text",
+          "text": ". Similarly, "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a^+} f(x) = L" },
+        {
+          "type": "text",
+          "text": " names approach from the right, "
+        },
+        { "type": "math", "source": "x > a" },
+        { "type": "text", "text": "." }
+      ]
+    },
+    {
+      "type": "figure",
+      "src": "figures/one-sided-limits.png",
+      "atom_id": "A-02",
+      "caption": [
+        {
+          "type": "text",
+          "text": "For "
+        },
+        { "type": "math", "source": "f(x) = x^2" },
+        {
+          "type": "text",
+          "text": " near "
+        },
+        { "type": "math", "source": "x = 2" },
+        {
+          "type": "text",
+          "text": " the two sides agree: as "
+        },
+        { "type": "math", "source": "x \\to 2^-" },
+        {
+          "type": "text",
+          "text": " the outputs rise toward 4, and as "
+        },
+        { "type": "math", "source": "x \\to 2^+" },
+        {
+          "type": "text",
+          "text": " they fall toward 4. Because both one-sided limits are 4, the two-sided limit exists and equals 4."
         }
       ]
     },
     {
       "type": "equation",
-      "source": "\\lim_{x \\to a} \\big(f(x) + g(x)\\big) = \\lim_{x \\to a} f(x) + \\lim_{x \\to a} g(x)",
+      "source": "\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = L \\;\\iff\\; \\lim_{x \\to a} f(x) = L",
       "display": true,
-      "number": "(2)"
+      "number": "(1)"
     },
     {
       "type": "paragraph",
       "content": [
         {
           "type": "text",
-          "text": "So for a polynomial, substitution always works: plug in "
-        },
-        { "type": "math", "source": "a" },
-        {
-          "type": "text",
-          "text": " and you are done. The interesting cases are quotients where substitution produces "
-        },
-        { "type": "math", "source": "0/0" },
-        {
-          "type": "text",
-          "text": ". That form is called indeterminate — it tells you nothing yet — and the standard move is to simplify the fraction algebraically and try substitution again."
+          "text": "The equivalence above is the existence test. If either one-sided limit is missing, or if the two disagree, the two-sided limit does not exist — no matter how well behaved the function looks elsewhere. A jump is the canonical case."
         }
       ]
     },
     {
-      "type": "worked-example",
-      "title": "A limit at a hole",
-      "problem": [
+      "type": "figure",
+      "src": "figures/jump-discontinuity.png",
+      "atom_id": "A-02",
+      "caption": [
         {
           "type": "text",
-          "text": "Compute "
+          "text": "At "
         },
-        {
-          "type": "math",
-          "source": "\\lim_{x \\to -2} \\dfrac{x^2 - 4}{x + 2}"
-        },
-        { "type": "text", "text": "." }
-      ],
-      "solution": [
-        [
-          {
-            "type": "text",
-            "text": "Substitute "
-          },
-          { "type": "math", "source": "x = -2" },
-          {
-            "type": "text",
-            "text": " to see the form: "
-          },
-          { "type": "math", "source": "\\dfrac{4 - 4}{0} = \\dfrac{0}{0}" },
-          { "type": "text", "text": ", indeterminate." }
-        ],
-        [
-          {
-            "type": "text",
-            "text": "Factor the numerator: "
-          },
-          {
-            "type": "math",
-            "source": "x^2 - 4 = (x - 2)(x + 2)"
-          },
-          {
-            "type": "text",
-            "text": ", so for "
-          },
-          { "type": "math", "source": "x \\neq -2" },
-          {
-            "type": "text",
-            "text": " the fraction simplifies to "
-          },
-          { "type": "math", "source": "x - 2" },
-          { "type": "text", "text": "." }
-        ],
-        [
-          {
-            "type": "text",
-            "text": "The limit ignores the point "
-          },
-          { "type": "math", "source": "x = -2" },
-          {
-            "type": "text",
-            "text": " itself, so substituting into the simplified form is valid: "
-          },
-          {
-            "type": "math",
-            "source": "\\lim_{x \\to -2} (x - 2) = -4"
-          },
-          { "type": "text", "text": "." }
-        ]
-      ]
-    },
-    {
-      "type": "list",
-      "ordered": true,
-      "items": [
-        [
-          {
-            "type": "text",
-            "text": "Substitute first. If you get a real number, that is the limit."
-          }
-        ],
-        [
-          {
-            "type": "text",
-            "text": "If you get "
-          },
-          { "type": "math", "source": "0/0" },
-          {
-            "type": "text",
-            "text": ", simplify the expression — factor, cancel, or combine fractions — and substitute again."
-          }
-        ],
-        [
-          {
-            "type": "text",
-            "text": "If the denominator alone goes to zero, the limit may be infinite or may not exist; investigate the sign on each side."
-          }
-        ]
-      ]
-    },
-    {
-      "type": "callout",
-      "kind": "warning",
-      "content": [
+        { "type": "math", "source": "x = 2" },
         {
           "type": "text",
-          "text": "A "
+          "text": " the left-hand limit is 1 and the right-hand limit is 3. They disagree, so "
         },
-        { "type": "math", "source": "0/0" },
+        { "type": "math", "source": "\\lim_{x \\to 2} f(x)" },
         {
           "type": "text",
-          "text": " form means the limit might be anything — 0, 4, "
+          "text": " does not exist, even though "
         },
-        { "type": "math", "source": "-4" },
+        { "type": "math", "source": "f(2)" },
         {
           "type": "text",
-          "text": ", or undefined. Never report the form itself as an answer."
+          "text": " is defined. The gap between the two branches is the jump."
         }
       ]
     },
@@ -160,34 +143,71 @@
       "parameters": {
         "series": [
           {
-            "label": "f(x) = (x^2 - 4)/(x + 2)",
+            "label": "left branch, f = 1",
             "points": [
-              [-4.0, -6.0], [-3.5, -5.5], [-3.0, -5.0], [-2.5, -4.5],
-              [-2.2, -4.2], [-2.05, -4.05],
-              [-1.95, -3.95], [-1.8, -3.8],
-              [-1.5, -3.5], [-1.0, -3.0], [-0.5, -2.5], [0.0, -2.0]
+              [-1.0, 1.0], [-0.5, 1.0], [0.0, 1.0], [0.5, 1.0],
+              [1.0, 1.0], [1.5, 1.0], [1.8, 1.0], [1.95, 1.0]
+            ]
+          },
+          {
+            "label": "right branch, f = 3",
+            "points": [
+              [2.0, 3.0], [2.2, 3.0], [2.5, 3.0], [3.0, 3.0],
+              [3.5, 3.0], [4.0, 3.0]
             ]
           }
         ],
         "xlabel": "x",
         "ylabel": "y",
-        "title": "The hole at x = -2, limit -4"
+        "title": "A jump at x = 2: the sides disagree"
       }
+    },
+    {
+      "type": "callout",
+      "kind": "important",
+      "content": [
+        {
+          "type": "text",
+          "text": "When a two-sided limit does not exist, "
+        },
+        { "type": "math", "source": "DNE" },
+        {
+          "type": "text",
+          "text": " is the answer — never a number and never a shrug. A limit that does not exist is information about how the function behaves, not a failure of the problem."
+        }
+      ]
     },
     {
       "type": "formative",
       "prompt": [
         {
           "type": "text",
-          "text": "Compute "
+          "text": "Suppose "
         },
-        {
-          "type": "math",
-          "source": "\\lim_{x \\to 4} \\dfrac{x - 4}{\\sqrt{x} - 2}"
-        },
+        { "type": "math", "source": "\\lim_{x \\to a^-} f(x) = 5" },
         {
           "type": "text",
-          "text": " and give the reasoning in one or two sentences."
+          "text": " and "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a^+} f(x) = 5" },
+        {
+          "type": "text",
+          "text": ", but "
+        },
+        { "type": "math", "source": "f(a) = 12" },
+        {
+          "type": "text",
+          "text": ". What is "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a} f(x)" },
+        {
+          "type": "text",
+          "text": "? State the role the value "
+        },
+        { "type": "math", "source": "f(a)" },
+        {
+          "type": "text",
+          "text": " plays in your answer."
         }
       ],
       "kind": "free_response"

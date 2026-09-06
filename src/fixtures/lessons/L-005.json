@@ -1,0 +1,168 @@
+{
+  "id": "L-005",
+  "title": "Continuity at a Point",
+  "atom_ids": ["A-05"],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Continuity is the property that lets you draw a graph without lifting your pen. The precise version ties together three things at a single point: the function has a value there, it has a limit there, and the two agree."
+        }
+      ]
+    },
+    {
+      "type": "definition",
+      "term": "Continuous at a point",
+      "content": [
+        {
+          "type": "text",
+          "text": "A function "
+        },
+        { "type": "math", "source": "f" },
+        {
+          "type": "text",
+          "text": " is continuous at "
+        },
+        { "type": "math", "source": "x = a" },
+        {
+          "type": "text",
+          "text": " when all three hold: "
+        },
+        { "type": "math", "source": "f(a)" },
+        { "type": "text", "text": " is defined, " },
+        { "type": "math", "source": "\\lim_{x \\to a} f(x)" },
+        { "type": "text", "text": " exists, and " },
+        {
+          "type": "math",
+          "source": "\\lim_{x \\to a} f(x) = f(a)"
+        },
+        { "type": "text", "text": "." }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The failing cases each break a different condition. The function in L-001 failed the first: "
+        },
+        { "type": "math", "source": "g(1)" },
+        {
+          "type": "text",
+          "text": " is undefined. The jump function in L-002 fails the second: its one-sided limits disagree, so no two-sided limit exists. And a function with a removable hole that has been filled with the wrong value fails the third."
+        }
+      ]
+    },
+    {
+      "type": "figure",
+      "src": "figures/jump-discontinuity.png",
+      "atom_id": "A-03",
+      "caption": [
+        {
+          "type": "text",
+          "text": "A jump discontinuity at "
+        },
+        { "type": "math", "source": "x = 2" },
+        {
+          "type": "text",
+          "text": ": the left-hand limit is 1, the right-hand limit is 3, and no single two-sided limit exists."
+        }
+      ]
+    },
+    {
+      "type": "worked-example",
+      "title": "Where is this function continuous?",
+      "problem": [
+        {
+          "type": "text",
+          "text": "Determine where "
+        },
+        {
+          "type": "math",
+          "source": "f(x) = \\dfrac{x^2 - 1}{x - 1}"
+        },
+        { "type": "text", "text": " is continuous." }
+      ],
+      "solution": [
+        [
+          {
+            "type": "text",
+            "text": "For "
+          },
+          { "type": "math", "source": "x \\neq 1" },
+          {
+            "type": "text",
+            "text": " the function simplifies to "
+          },
+          { "type": "math", "source": "x + 1" },
+          {
+            "type": "text",
+            "text": ", a polynomial, which is continuous everywhere it is defined."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "At "
+          },
+          { "type": "math", "source": "x = 1" },
+          {
+            "type": "text",
+            "text": " the function is undefined — the first condition fails — so it is discontinuous there, even though "
+          },
+          {
+            "type": "math",
+            "source": "\\lim_{x \\to 1} f(x) = 2"
+          },
+          {
+            "type": "text",
+            "text": " exists. The discontinuity is removable: redefining "
+          },
+          { "type": "math", "source": "f(1) = 2" },
+          {
+            "type": "text",
+            "text": " would make the function continuous."
+          }
+        ]
+      ]
+    },
+    {
+      "type": "callout",
+      "kind": "important",
+      "content": [
+        {
+          "type": "text",
+          "text": "Continuity is three separate claims glued together. When a problem asks where a function is continuous, check each point against all three conditions — the most common error is stopping after the limit exists."
+        }
+      ]
+    },
+    {
+      "type": "equation",
+      "source": "f \\text{ continuous at } a \\;\\iff\\; \\lim_{x \\to a} f(x) = f(a)",
+      "display": true,
+      "number": "(1)"
+    },
+    {
+      "type": "formative",
+      "prompt": [
+        {
+          "type": "text",
+          "text": "A friend says: the limit of a function at "
+        },
+        { "type": "math", "source": "x = a" },
+        {
+          "type": "text",
+          "text": " is 5, so the function must be continuous at "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": ". Explain precisely why this does not follow."
+        }
+      ],
+      "kind": "free_response"
+    }
+  ]
+}

@@ -48,12 +48,15 @@ async function buildClank(
 }
 
 describe('the committed course.clank', () => {
-  it('opens and yields three lessons with figures', async () => {
+  it('opens and yields all nine lessons with six figures', async () => {
     const result = await openClank(readFileSync(join(fixtureRoot, 'course.clank')))
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.course.lessons.map((l) => l.id)).toEqual(['L-001', 'L-002', 'L-003'])
-    expect(result.course.figures.size).toBe(2)
+    expect(result.course.lessons.map((l) => l.id)).toEqual([
+      'L-001', 'L-002', 'L-003', 'L-004', 'L-005',
+      'L-006', 'L-007', 'L-008', 'L-009',
+    ])
+    expect(result.course.figures.size).toBe(6)
     expect(result.course.manifest.course_id).toBeTruthy()
   })
 
@@ -145,27 +148,27 @@ describe('schema validation at the boundary', () => {
 it('refuses a spine entry with no lesson file (ghost lesson)', async () => {
     const files = readFixtures()
     const spine = JSON.parse(new TextDecoder().decode(files['spine.json']))
-    spine.modules[0].lessons.push({ id: 'L-004', title: 'Ghost', atoms: [] })
+    spine.modules[0].lessons.push({ id: 'L-099', title: 'Ghost', atoms: [] })
     files['spine.json'] = strToU8(JSON.stringify(spine))
 
     const result = await openClank(await buildClank(files))
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.reason).toMatch(/spine and lessons disagree/)
-    expect(result.reason).toMatch(/L-004.*no lesson file/)
+    expect(result.reason).toMatch(/L-099.*no lesson file/)
   })
 
   it('refuses an orphan lesson file with no spine entry', async () => {
     const files = readFixtures()
-    files['lessons/L-004.json'] = strToU8(
-      JSON.stringify({ id: 'L-004', title: 'Orphan', atom_ids: [], blocks: [] }),
+    files['lessons/L-099.json'] = strToU8(
+      JSON.stringify({ id: 'L-099', title: 'Orphan', atom_ids: [], blocks: [] }),
     )
 
     const result = await openClank(await buildClank(files))
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.reason).toMatch(/spine and lessons disagree/)
-    expect(result.reason).toMatch(/L-004.*no spine entry/)
+    expect(result.reason).toMatch(/L-099.*no spine entry/)
   })
 
   it('refuses a lesson whose id does not match its filename', async () => {
@@ -239,5 +242,4 @@ function findEocd(bytes: Uint8Array): number {
 function readU32At(bytes: Uint8Array, off: number): number {
   return (bytes[off] | (bytes[off + 1] << 8) | (bytes[off + 2] << 16) | (bytes[off + 3] << 24)) >>> 0
 }
-
 

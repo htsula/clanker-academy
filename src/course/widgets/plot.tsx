@@ -93,6 +93,21 @@ export function PlotWidget({ params }: { params: PlotParams }) {
   const xticks = 5
   const yticks = 4
 
+  // The legend lives inside the frame. Bottom-right used to stack below the
+  // SVG edge once a lesson used more than three series and the rows were
+  // clipped (svg roots clip by default); top-left with a backdrop never
+  // overflows, and long series lists wrap into two columns.
+  const legendSeries = params.series.filter((s) => s.label)
+  const legendRows = legendSeries.length
+  const legendCols = legendRows > 9 ? 2 : 1
+  const legendX = M + 4
+  const legendY = 24
+  const legendHeight = Math.ceil(legendRows / legendCols) * 14 + 6
+  const legendWidth = Math.max(
+    ...legendSeries.map((s) => s.label!.length * 7),
+    80,
+  )
+
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
@@ -132,14 +147,36 @@ export function PlotWidget({ params }: { params: PlotParams }) {
         return (
           <g key={i}>
             <polyline points={points} fill="none" className={`plot-series plot-series-${i % 3}`} />
-            {series.label ? (
-              <text x={W - M} y={H - M + 34 + i * 14} textAnchor="end" className="plot-legend">
-                {series.label}
-              </text>
-            ) : null}
           </g>
         )
       })}
+
+      {legendSeries.length > 0 ? (
+        <g className="plot-legend">
+          <rect
+            x={legendX - 4}
+            y={legendY - 12}
+            width={Math.min(legendWidth + 8, W - 2 * M)}
+            height={legendHeight}
+            rx={3}
+            className="plot-legend-backdrop"
+          />
+          {legendSeries.map((series, i) => {
+            const col = legendCols === 2 && i >= Math.ceil(legendRows / 2) ? 1 : 0
+            const row = col === 1 ? i - Math.ceil(legendRows / 2) : i
+            return (
+              <text
+                key={i}
+                x={legendX + col * (Math.min(legendWidth + 8, W - 2 * M) / 2)}
+                y={legendY + row * 14}
+                className="plot-legend"
+              >
+                {series.label}
+              </text>
+            )
+          })}
+        </g>
+      ) : null}
 
       {params.xlabel ? (
         <text x={W / 2} y={H - 6} textAnchor="middle" className="plot-axis-label">

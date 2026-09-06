@@ -1,5 +1,5 @@
-import { readdirSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   lessonSchema,
@@ -11,17 +11,21 @@ import {
   spineSchema,
 } from '../src/course/schema'
 
-import lesson1 from '../src/fixtures/lessons/L-001.json'
-import lesson2 from '../src/fixtures/lessons/L-002.json'
-import lesson3 from '../src/fixtures/lessons/L-003.json'
 import manifest from '../src/fixtures/manifest.json'
 import spine from '../src/fixtures/spine.json'
 
+const lessonsDir = resolve(__dirname, '../src/fixtures/lessons')
+const lessonIds = readdirSync(lessonsDir)
+  .filter((name) => /^L-\d{3}\.json$/.test(name))
+  .sort()
+const lessons = lessonIds.map((name) => JSON.parse(readFileSync(join(lessonsDir, name), 'utf8')))
+
 describe('schema fixtures validate', () => {
-  it('parses all three lesson fixtures', () => {
-    expect(() => parseLesson(lesson1)).not.toThrow()
-    expect(() => parseLesson(lesson2)).not.toThrow()
-    expect(() => parseLesson(lesson3)).not.toThrow()
+  it('parses every lesson fixture in the course', () => {
+    expect(lessonIds.length).toBeGreaterThanOrEqual(9)
+    for (const lesson of lessons) {
+      expect(() => parseLesson(lesson)).not.toThrow()
+    }
   })
 
   it('parses the manifest and spine fixtures', () => {
@@ -29,9 +33,14 @@ describe('schema fixtures validate', () => {
     expect(() => parseSpine(spine)).not.toThrow()
   })
 
+  it('every lesson in the spine has a fixture and vice versa', () => {
+    const spineIds = spine.modules.flatMap((m) => m.lessons.map((l) => l.id)).sort()
+    expect(spineIds).toEqual(lessonIds.map((name) => name.replace(/\.json$/, '')))
+  })
+
   it('every figure referenced by a lesson exists in the figures folder', () => {
     const available = new Set(readdirSync(resolve(__dirname, '../src/fixtures/figures')))
-    for (const lesson of [lesson1, lesson2, lesson3] as unknown as ReturnType<typeof lessonSchema.parse>[]) {
+    for (const lesson of lessons as unknown as ReturnType<typeof lessonSchema.parse>[]) {
       for (const block of lesson.blocks) {
         if (block.type === 'figure') {
           const name = block.src.split('/').pop()

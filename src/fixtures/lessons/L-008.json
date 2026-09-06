@@ -1,0 +1,287 @@
+{
+  "id": "L-008",
+  "title": "Infinite Limits and Vertical Asymptotes",
+  "atom_ids": ["A-08"],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The outputs can also diverge: as "
+        },
+        { "type": "math", "source": "x" },
+        {
+          "type": "text",
+          "text": " approaches a point, the values of "
+        },
+        { "type": "math", "source": "f(x)" },
+        {
+          "type": "text",
+          "text": " may grow without bound. The notation "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a} f(x) = \\infty" },
+        {
+          "type": "text",
+          "text": " names this behaviour — it is not a claim that a limit exists as a number. A limit is a real number; "
+        },
+        { "type": "math", "source": "\\infty" },
+        {
+          "type": "text",
+          "text": " is a report of unbounded growth."
+        }
+      ]
+    },
+    {
+      "type": "definition",
+      "term": "Vertical asymptote",
+      "content": [
+        {
+          "type": "text",
+          "text": "The line "
+        },
+        { "type": "math", "source": "x = a" },
+        {
+          "type": "text",
+          "text": " is a vertical asymptote of "
+        },
+        { "type": "math", "source": "f" },
+        {
+          "type": "text",
+          "text": " when at least one one-sided limit of "
+        },
+        { "type": "math", "source": "f" },
+        {
+          "type": "text",
+          "text": " at "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " is "
+        },
+        { "type": "math", "source": "\\infty" },
+        { "type": "text", "text": " or " },
+        { "type": "math", "source": "-\\infty" },
+        {
+          "type": "text",
+          "text": " — the values diverge as "
+        },
+        { "type": "math", "source": "x" },
+        {
+          "type": "text",
+          "text": " approaches "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " from one side."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Infinite limits are decided by sign. To analyse "
+        },
+        { "type": "math", "source": "f" },
+        {
+          "type": "text",
+          "text": " near "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": ", ask what sign each factor has just to the left of "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " and just to the right."
+        }
+      ]
+    },
+    {
+      "type": "worked-example",
+      "title": "Signs decide the side",
+      "problem": [
+        {
+          "type": "text",
+          "text": "Find the one-sided limits "
+        },
+        { "type": "math", "source": "\\lim_{x \\to 3^-} \\dfrac{2x}{x - 3}" },
+        { "type": "text", "text": " and " },
+        { "type": "math", "source": "\\lim_{x \\to 3^+} \\dfrac{2x}{x - 3}" },
+        { "type": "text", "text": "." }
+      ],
+      "solution": [
+        [
+          {
+            "type": "text",
+            "text": "Near "
+          },
+          { "type": "math", "source": "x = 3" },
+          {
+            "type": "text",
+            "text": " the numerator "
+          },
+          { "type": "math", "source": "2x" },
+          {
+            "type": "text",
+            "text": " is about 6, positive on both sides."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "For "
+          },
+          { "type": "math", "source": "x" },
+          {
+            "type": "text",
+            "text": " just below 3, the denominator "
+          },
+          { "type": "math", "source": "x - 3" },
+          {
+            "type": "text",
+            "text": " is negative and tiny, so the quotient is a large negative number: "
+          },
+          { "type": "math", "source": "\\lim_{x \\to 3^-} \\dfrac{2x}{x - 3} = -\\infty" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "For "
+          },
+          { "type": "math", "source": "x" },
+          {
+            "type": "text",
+            "text": " just above 3, the denominator is positive and tiny, so the quotient is large and positive: "
+          },
+          { "type": "math", "source": "\\lim_{x \\to 3^+} \\dfrac{2x}{x - 3} = \\infty" },
+          { "type": "text", "text": "." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The one-sided limits disagree — both diverge, but in opposite directions — so by the existence test in L-002 the two-sided limit does not exist. The line "
+          },
+          { "type": "math", "source": "x = 3" },
+          {
+            "type": "text",
+            "text": " is a vertical asymptote."
+          }
+        ]
+      ]
+    },
+    {
+      "type": "figure",
+      "src": "figures/vertical-asymptote.png",
+      "atom_id": "A-08",
+      "caption": [
+        {
+          "type": "text",
+          "text": "For "
+        },
+        { "type": "math", "source": "y = \\dfrac{1}{x - 2}" },
+        {
+          "type": "text",
+          "text": " the curve drops to "
+        },
+        { "type": "math", "source": "-\\infty" },
+        {
+          "type": "text",
+          "text": " as "
+        },
+        { "type": "math", "source": "x \\to 2^-" },
+        {
+          "type": "text",
+          "text": " and rises to "
+        },
+        { "type": "math", "source": "\\infty" },
+        {
+          "type": "text",
+          "text": " as "
+        },
+        { "type": "math", "source": "x \\to 2^+" },
+        {
+          "type": "text",
+          "text": ". The dashed line "
+        },
+        { "type": "math", "source": "x = 2" },
+        { "type": "text", "text": " is a vertical asymptote." }
+      ]
+    },
+    {
+      "type": "widget",
+      "name": "plot",
+      "version": "1.0",
+      "parameters": {
+        "series": [
+          {
+            "label": "left of 2: y = 1/(x - 2)",
+            "points": [
+              [0.3, -0.588], [0.6, -0.714], [1.0, -1.0], [1.4, -1.667],
+              [1.7, -3.333], [1.85, -6.667], [1.95, -20.0]
+            ]
+          },
+          {
+            "label": "right of 2: y = 1/(x - 2)",
+            "points": [
+              [2.1, 10.0], [2.2, 5.0], [2.5, 2.0], [3.0, 1.0],
+              [4.0, 0.5], [5.0, 0.333], [6.0, 0.25]
+            ]
+          }
+        ],
+        "xlabel": "x",
+        "ylabel": "y",
+        "title": "1/(x - 2): unbounded growth on both sides of x = 2"
+      }
+    },
+    {
+      "type": "callout",
+      "kind": "warning",
+      "content": [
+        {
+          "type": "text",
+          "text": "Writing "
+        },
+        { "type": "math", "source": "\\lim_{x \\to a} f(x) = \\infty" },
+        {
+          "type": "text",
+          "text": " is shorthand for the values growing without bound. The limit does not exist as a number, and the function is undefined at "
+        },
+        { "type": "math", "source": "a" },
+        {
+          "type": "text",
+          "text": " — no output is ever 'equal to infinity'."
+        }
+      ]
+    },
+    {
+      "type": "formative",
+      "prompt": [
+        {
+          "type": "text",
+          "text": "Explain why "
+        },
+        { "type": "math", "source": "\\lim_{x \\to 2} \\dfrac{1}{x - 2}" },
+        {
+          "type": "text",
+          "text": " does not exist, even though both one-sided limits exist as "
+        },
+        { "type": "math", "source": "\\infty" },
+        { "type": "text", "text": " and " },
+        { "type": "math", "source": "-\\infty" },
+        {
+          "type": "text",
+          "text": ". Use the one-sided existence test from L-002."
+        }
+      ],
+      "kind": "free_response"
+    }
+  ]
+}
