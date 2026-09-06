@@ -190,12 +190,12 @@ describe('widget rendering', () => {
     expect(screen.getByTestId('flaky-ok')).toBeInTheDocument()
   })
 
-  it('keeps the legend inside the SVG frame even with five labelled series', () => {
+  it('keeps the legend inside the frame, below the title, with five distinct colours', () => {
     const series = Array.from({ length: 5 }, (_, i) => ({
       label: `series ${i + 1}`,
       points: [[i, 0], [i + 1, 1]] as [number, number][],
     }))
-    const { container } = render(<PlotWidget params={{ series }} />)
+    const { container } = render(<PlotWidget params={{ series, title: 'A titled plot' }} />)
     const svg = container.querySelector('svg')
     const viewBox = svg?.getAttribute('viewBox')?.split(' ').map(Number) ?? [0, 0, 480, 320]
     const [, , vbW, vbH] = viewBox
@@ -208,6 +208,22 @@ describe('widget rendering', () => {
       expect(x, 'legend row must render inside the frame width').toBeLessThan(vbW)
     }
     expect(legendTexts.length).toBe(5)
+
+    // The backdrop is 88% opaque — it must not sit over the title text.
+    const title = container.querySelector('.plot-title')
+    const backdrop = container.querySelector('.plot-legend-backdrop')
+    expect(title).not.toBeNull()
+    expect(backdrop).not.toBeNull()
+    const backdropTop = Number(backdrop?.getAttribute('y'))
+    const titleBaseline = Number(title?.getAttribute('y'))
+    expect(backdropTop, 'backdrop must start below the title baseline').toBeGreaterThan(titleBaseline)
+
+    // Five series must be five distinguishable colours — the L-009 window
+    // plot's whole point is telling the epsilon band from the delta lines.
+    const strokes = Array.from(container.querySelectorAll('polyline')).map((p) =>
+      p.getAttribute('class')?.replace('plot-series ', ''),
+    )
+    expect(new Set(strokes).size).toBe(5)
   })
 
   it('rejects a plot range where min >= max at the schema', () => {

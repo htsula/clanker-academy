@@ -13,6 +13,13 @@
       ]
     },
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Three conditions, one point" }
+      ]
+    },
+    {
       "type": "definition",
       "term": "Continuous at a point",
       "content": [
@@ -53,6 +60,13 @@
           "type": "text",
           "text": " is undefined. The jump function in L-002 fails the second: its one-sided limits disagree, so no two-sided limit exists. And a function with a removable hole that has been filled with the wrong value fails the third."
         }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Which condition breaks?" }
       ]
     },
     {

@@ -13,6 +13,13 @@
       ]
     },
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "The two sides of a point" }
+      ]
+    },
+    {
       "type": "definition",
       "term": "One-sided limits",
       "content": [
@@ -102,6 +109,13 @@
       "number": "(1)"
     },
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "The existence test" }
+      ]
+    },
+    {
       "type": "paragraph",
       "content": [
         {
@@ -170,7 +184,7 @@
           "type": "text",
           "text": "When a two-sided limit does not exist, "
         },
-        { "type": "math", "source": "DNE" },
+        { "type": "math", "source": "\\text{DNE}" },
         {
           "type": "text",
           "text": " is the answer — never a number and never a shrug. A limit that does not exist is information about how the function behaves, not a failure of the problem."

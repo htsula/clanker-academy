@@ -19,4 +19,12 @@ describe('App', () => {
       await screen.findByRole('heading', { level: 1, name: 'The Idea of a Limit' }),
     ).toBeInTheDocument()
   })
+
+  it('shows the modules as the lesson nav shape', async () => {
+    render(<App />)
+    expect(await screen.findByText('1. The Concept of a Limit')).toBeInTheDocument()
+    expect(screen.getByText('2. Continuity')).toBeInTheDocument()
+    expect(screen.getByText('3. Limits at Infinity and Asymptotes')).toBeInTheDocument()
+    expect(screen.getByText('4. The Precise Definition')).toBeInTheDocument()
+  })
 })

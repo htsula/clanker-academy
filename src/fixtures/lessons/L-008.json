@@ -80,6 +80,13 @@
       ]
     },
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Signs decide the side" }
+      ]
+    },
+    {
       "type": "paragraph",
       "content": [
         {

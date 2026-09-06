@@ -4,6 +4,13 @@
   "atom_ids": ["A-06"],
   "blocks": [
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Continuity on an interval" }
+      ]
+    },
+    {
       "type": "paragraph",
       "content": [
         {
@@ -243,6 +250,13 @@
         "ylabel": "y",
         "title": "x^3 - x - 1 crosses zero between x = 1 and x = 2"
       }
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "Existence, not a recipe" }
+      ]
     },
     {
       "type": "callout",

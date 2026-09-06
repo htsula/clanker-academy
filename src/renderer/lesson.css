@@ -1,5 +1,6 @@
 .lesson {
   max-width: 46rem;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem 1.5rem 6rem;
   line-height: 1.65;
@@ -20,8 +21,10 @@
 }
 
 .display-math {
+  display: block;
   text-align: center;
   padding: 0.5rem 0;
+  overflow-x: auto;
 }
 
 .math-error {
@@ -132,6 +135,12 @@
   align-items: center;
   justify-content: center;
   background: #fafbfc;
+}
+
+.figure-frame img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .figure-placeholder {
@@ -255,6 +264,18 @@
 
 .plot-series-2 {
   stroke: #188038;
+}
+
+.plot-series-3 {
+  stroke: #7b1fa2;
+}
+
+.plot-series-4 {
+  stroke: #e8710a;
+}
+
+.plot-series-5 {
+  stroke: #0d7377;
 }
 
 .formative {

@@ -4,6 +4,13 @@
   "atom_ids": ["A-07"],
   "blocks": [
     {
+      "type": "heading",
+      "level": 2,
+      "content": [
+        { "type": "text", "text": "The far ends of the real line" }
+      ]
+    },
+    {
       "type": "paragraph",
       "content": [
         {
@@ -203,17 +210,36 @@
       }
     },
     {
-      "type": "paragraph",
+      "type": "heading",
+      "level": 2,
       "content": [
-        {
-          "type": "text",
-          "text": "The pattern is the ratio of the leading coefficients. When the numerator and denominator have equal degree, the limit is that ratio — in the example above, "
-        },
-        { "type": "math", "source": "2/1" },
-        {
-          "type": "text",
-          "text": ". When the numerator's degree is larger, the quotient does not settle; it grows without bound, and the limit does not exist — L-008 gives the precise language for that case. When the denominator's degree is larger, the quotient tends to 0."
-        }
+        { "type": "text", "text": "Three cases, one pattern" }
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        [
+          {
+            "type": "text",
+            "text": "Equal degrees: the limit is the ratio of the leading coefficients — "
+          },
+          { "type": "math", "source": "2/1" },
+          { "type": "text", "text": " in the example above." }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Numerator degree larger: the quotient does not settle — it grows without bound, and the limit does not exist (L-008 gives the precise language)."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Denominator degree larger: the quotient tends to 0."
+          }
+        ]
       ]
     },
     {

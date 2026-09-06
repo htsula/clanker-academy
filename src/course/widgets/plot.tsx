@@ -96,12 +96,13 @@ export function PlotWidget({ params }: { params: PlotParams }) {
   // The legend lives inside the frame. Bottom-right used to stack below the
   // SVG edge once a lesson used more than three series and the rows were
   // clipped (svg roots clip by default); top-left with a backdrop never
-  // overflows, and long series lists wrap into two columns.
+  // overflows, long series lists wrap into two columns, and the block sits
+  // below the title rather than over it (the backdrop is 88% opaque).
   const legendSeries = params.series.filter((s) => s.label)
   const legendRows = legendSeries.length
   const legendCols = legendRows > 9 ? 2 : 1
   const legendX = M + 4
-  const legendY = 24
+  const legendY = params.title ? 36 : 24
   const legendHeight = Math.ceil(legendRows / legendCols) * 14 + 6
   const legendWidth = Math.max(
     ...legendSeries.map((s) => s.label!.length * 7),
@@ -146,7 +147,7 @@ export function PlotWidget({ params }: { params: PlotParams }) {
         const points = series.points.map(([x, y]) => `${fx(x)},${fy(y)}`).join(' ')
         return (
           <g key={i}>
-            <polyline points={points} fill="none" className={`plot-series plot-series-${i % 3}`} />
+            <polyline points={points} fill="none" className={`plot-series plot-series-${i % 6}`} />
           </g>
         )
       })}
