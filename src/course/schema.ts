@@ -149,29 +149,40 @@ export const lessonSchema = z.object({
 
 // --- Container shapes -------------------------------------------------------
 
-export const manifestSchema = z.object({
-  course_id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
-  version: z.number().int().nonnegative(),
-  content_hash: z.string(),
-  title: noHtml,
-  subject: noHtml,
-  level: noHtml,
-  hours_estimate: z.number().nonnegative(),
-  prereq_courses: z.array(noHtml).default([]),
-  prereq_atoms: z.array(noHtml).default([]),
-  generator: z.object({
-    harness_version: z.string(),
-    pipeline: z.array(z.unknown()).default([]),
-    models: z.record(z.string(), z.string()).default({}),
-    generated_at: z.string(),
-    tokens: z.record(z.string(), z.object({ in: z.number().nonnegative(), out: z.number().nonnegative() })).default({}),
-    cost_estimate: z.number().nonnegative().default(0),
-  }),
-  scope: z.enum(['full', 'final_only']),
-  grounding: z.enum(['parametric', 'open_corpus', 'user_supplied', 'mixed']),
-  derived_from_user_material: z.boolean(),
-  integrity: z.record(z.string(), z.string()),
-})
+// widget identity as it appears in manifest.widgets_used[] — the same
+// name@major.minor shape a widget block carries (see `widget` above).
+export const widgetIdentityString = z.string().regex(/^[a-z0-9-]+@\d+\.\d+$/)
+
+export const manifestSchema = z
+  .object({
+    course_id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
+    version: z.number().int().nonnegative(),
+    content_hash: z.string(),
+    title: noHtml,
+    subject: noHtml,
+    level: noHtml,
+    hours_estimate: z.number().nonnegative(),
+    prereq_courses: z.array(noHtml).default([]),
+    prereq_atoms: z.array(noHtml).default([]),
+    generator: z.object({
+      harness_version: z.string(),
+      pipeline: z.array(z.unknown()).default([]),
+      models: z.record(z.string(), z.string()).default({}),
+      generated_at: z.string(),
+      tokens: z.record(z.string(), z.object({ in: z.number().nonnegative(), out: z.number().nonnegative() })).default({}),
+      cost_estimate: z.number().nonnegative().default(0),
+    }),
+    scope: z.enum(['full', 'final_only']),
+    grounding: z.enum(['parametric', 'open_corpus', 'user_supplied', 'mixed']),
+    derived_from_user_material: z.boolean(),
+    // Collected at package time from the lesson trees (§11.6a) — an honest
+    // manifest lists exactly the widgets the trees actually use, and a course
+    // that carries a key the schema does not know is refused, never silently
+    // stripped.
+    widgets_used: z.array(widgetIdentityString).default([]),
+    integrity: z.record(z.string(), z.string()),
+  })
+  .strict()
 
 export const atomSchema = z.object({
   id: noHtml,

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, writeFileSync, statSync } from 'node:fs'
 import { resolve, dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { collectWidgets } from '../src/course/widgets-used.mjs'
 
 // Packages src/fixtures/ into a real .clank (scripts/build-clank.mjs), the
 // container layout of §3.1. Hash format must match src/course/clank.ts:
@@ -51,6 +52,16 @@ const contentHash = sha256(Buffer.from(parts.join(''), 'utf8'))
 const manifest = JSON.parse(new TextDecoder().decode(files['manifest.json']))
 manifest.integrity = integrity
 manifest.content_hash = contentHash
+
+// widgets_used[] is collected from the lesson trees — never hand-edited, never
+// generated. The walk is the shared module the runtime registry re-exports.
+const widgetsUsed = new Set()
+for (const [path, data] of Object.entries(files)) {
+  if (!path.startsWith('lessons/') || !path.endsWith('.json')) continue
+  const lesson = JSON.parse(new TextDecoder().decode(data))
+  for (const w of collectWidgets(lesson.blocks ?? [])) widgetsUsed.add(`${w.name}@${w.version}`)
+}
+manifest.widgets_used = [...widgetsUsed].sort()
 
 const zipFiles = {}
 for (const [path, data] of Object.entries(files)) {

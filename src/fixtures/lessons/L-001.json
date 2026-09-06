@@ -4,11 +4,6 @@
   "atom_ids": ["A-01"],
   "blocks": [
     {
-      "type": "heading",
-      "level": 2,
-      "content": [{ "type": "text", "text": "The Idea of a Limit" }]
-    },
-    {
       "type": "paragraph",
       "content": [
         {

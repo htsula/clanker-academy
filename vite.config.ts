@@ -9,8 +9,8 @@ export default defineConfig({
     // to drift to the next free port when this one is taken, which makes the
     // Tauri window load whichever older server still holds 5173 — a stale build
     // shown as the current one. strictPort turns that silent substitution into
-    // a hard failure; `npm run predev` reclaims the port first so the failure
-    // only fires for a cause worth stopping on.
+    // a hard failure; `npm run predev` gets there first and names the process
+    // responsible, and `npm run dev:force` is the opt-in that reclaims the port.
     port: 5173,
     strictPort: true,
   },

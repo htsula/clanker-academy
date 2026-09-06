@@ -1,6 +1,5 @@
 import type { ComponentType } from 'react'
 import { z } from 'zod'
-import type { Block } from './schema'
 
 // The widget registry is declared in code, never in a course file (§8.2). A
 // course file may only instantiate a widget; it may never author one.
@@ -74,23 +73,8 @@ export function resolveWidget(name: string, requested: string, parameters: unkno
   return { status: 'ok', registration, params: check.data }
 }
 
-export interface WidgetIdentity {
-  name: string
-  version: string
-}
-
-// Walks a lesson tree and returns the exact widget identities used —
-// manifest.widgets_used[] is built from this at package time. Collected, never
-// generated: this is deterministic, zero-cost bookkeeping (§11.6a).
-export function collectWidgets(blocks: readonly Block[]): WidgetIdentity[] {
-  const seen = new Map<string, WidgetIdentity>()
-  for (const block of blocks) {
-    if (block.type === 'widget') {
-      const key = `${block.name}@${block.version}`
-      if (!seen.has(key)) seen.set(key, { name: block.name, version: block.version })
-    }
-  }
-  return [...seen.values()].sort(
-    (a, b) => a.name.localeCompare(b.name) || a.version.localeCompare(b.version),
-  )
-}
+// The walk lives in the plain-JS module so scripts/build-clank.mjs can import
+// the very same implementation — one source of truth for the packer and the
+// runtime (see widgets-used.mjs).
+export type { WidgetIdentity } from './widgets-used.mjs'
+export { collectWidgets } from './widgets-used.mjs'

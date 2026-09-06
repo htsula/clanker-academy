@@ -4,11 +4,6 @@
   "atom_ids": ["A-02"],
   "blocks": [
     {
-      "type": "heading",
-      "level": 2,
-      "content": [{ "type": "text", "text": "Computing Limits" }]
-    },
-    {
       "type": "paragraph",
       "content": [
         {

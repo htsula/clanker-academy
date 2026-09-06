@@ -142,6 +142,45 @@ describe('schema validation at the boundary', () => {
     expect(result).toEqual({ ok: false, reason: 'not a valid zip archive' })
   })
 
+it('refuses a spine entry with no lesson file (ghost lesson)', async () => {
+    const files = readFixtures()
+    const spine = JSON.parse(new TextDecoder().decode(files['spine.json']))
+    spine.modules[0].lessons.push({ id: 'L-004', title: 'Ghost', atoms: [] })
+    files['spine.json'] = strToU8(JSON.stringify(spine))
+
+    const result = await openClank(await buildClank(files))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.reason).toMatch(/spine and lessons disagree/)
+    expect(result.reason).toMatch(/L-004.*no lesson file/)
+  })
+
+  it('refuses an orphan lesson file with no spine entry', async () => {
+    const files = readFixtures()
+    files['lessons/L-004.json'] = strToU8(
+      JSON.stringify({ id: 'L-004', title: 'Orphan', atom_ids: [], blocks: [] }),
+    )
+
+    const result = await openClank(await buildClank(files))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.reason).toMatch(/spine and lessons disagree/)
+    expect(result.reason).toMatch(/L-004.*no spine entry/)
+  })
+
+  it('refuses a lesson whose id does not match its filename', async () => {
+    const files = readFixtures()
+    // lessons/L-901.json carries L-001's content, so the id sets still match —
+    // only the filename check can catch this.
+    files['lessons/L-901.json'] = files['lessons/L-001.json']
+    delete files['lessons/L-001.json']
+
+    const result = await openClank(await buildClank(files))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.reason).toMatch(/lessons\/L-901\.json contains id L-001/)
+  })
+
   it('refuses a zip whose central directory declares a huge entry — before decompressing', async () => {
     const files = readFixtures()
     const clank = await buildClank(files)
@@ -200,3 +239,5 @@ function findEocd(bytes: Uint8Array): number {
 function readU32At(bytes: Uint8Array, off: number): number {
   return (bytes[off] | (bytes[off + 1] << 8) | (bytes[off + 2] << 16) | (bytes[off + 3] << 24)) >>> 0
 }
+
+

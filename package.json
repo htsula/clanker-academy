@@ -6,6 +6,9 @@
   "scripts": {
     "predev": "node scripts/free-port.mjs 5173",
     "dev": "vite",
+    "predev:force": "node scripts/free-port.mjs 5173 --force",
+    "dev:force": "vite",
+    "dev:clean": "node scripts/free-port.mjs 5173 --force",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -68,6 +68,9 @@ jobs:
       - name: Build
         run: npm run tauri build
 
+      - name: Smoke-check the bundled .clank asset
+        run: node scripts/smoke-dist.mjs
+
       - name: Upload installers
         uses: actions/upload-artifact@v4
         with:

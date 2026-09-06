@@ -87,6 +87,24 @@ describe('schema rejections', () => {
     expect(() => manifestSchema.parse(broken)).toThrow()
   })
 
+  it('keeps widgets_used through a parse round-trip', () => {
+    const withWidgets = { ...(manifest as Record<string, unknown>), widgets_used: ['plot@1.0'] }
+    const parsed = manifestSchema.parse(withWidgets)
+    expect(parsed.widgets_used).toEqual(['plot@1.0'])
+  })
+
+  it('rejects a malformed widgets_used entry', () => {
+    const broken = { ...(manifest as Record<string, unknown>), widgets_used: ['plot'] }
+    expect(() => manifestSchema.parse(broken)).toThrow()
+    const brokenVersion = { ...(manifest as Record<string, unknown>), widgets_used: ['plot@1'] }
+    expect(() => manifestSchema.parse(brokenVersion)).toThrow()
+  })
+
+  it('rejects an unrecognized manifest key instead of silently dropping it', () => {
+    const sneaky = { ...(manifest as Record<string, unknown>), widgets_used: ['plot@1.0'], smuggled: true }
+    expect(() => manifestSchema.parse(sneaky)).toThrow(/unrecognized/i)
+  })
+
   it('rejects a spine missing the modules list', () => {
     const broken = { ...(spine as Record<string, unknown>) }
     delete (broken as { modules?: unknown }).modules

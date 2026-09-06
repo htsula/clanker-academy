@@ -160,10 +160,35 @@ export async function openClank(bytes: Uint8Array): Promise<OpenResult> {
   for (const path of lessonPaths) {
     const raw = files[path]
     try {
-      lessons.push(loadLesson(JSON.parse(strFromU8(raw))))
+      const lesson = loadLesson(JSON.parse(strFromU8(raw)))
+      const fileId = path.slice('lessons/'.length, -'.json'.length)
+      if (lesson.id !== fileId) {
+        return { ok: false, reason: `${path} contains id ${lesson.id}, which does not match its filename` }
+      }
+      lessons.push(lesson)
     } catch (err) {
       return { ok: false, reason: `${path} failed validation: ${err instanceof Error ? err.message : 'unknown error'}` }
     }
+  }
+
+  // The spine is the course's table of contents and the lesson files are its
+  // chapters; they must name the same set. A spine entry with no lesson file
+  // would render an empty numbered button, and an orphan lesson file would be
+  // parsed but unreachable — both are refused here, loudly.
+  const spineLessonIds = spineResult.modules.flatMap((m) => m.lessons.map((l) => l.id))
+  const loadedLessonIds = lessons.map((l) => l.id)
+  const loadedSet = new Set(loadedLessonIds)
+  const spineSet = new Set(spineLessonIds)
+  if (spineSet.size !== spineLessonIds.length) {
+    return { ok: false, reason: 'spine lists the same lesson id more than once' }
+  }
+  const missing = spineLessonIds.filter((id) => !loadedSet.has(id))
+  const orphan = loadedLessonIds.filter((id) => !spineSet.has(id))
+  if (missing.length > 0 || orphan.length > 0) {
+    const detail: string[] = []
+    if (missing.length > 0) detail.push(`spine lists ${missing.join(', ')} with no lesson file`)
+    if (orphan.length > 0) detail.push(`lesson file ${orphan.join(', ')} has no spine entry`)
+    return { ok: false, reason: `spine and lessons disagree: ${detail.join('; ')}` }
   }
 
   const figures = new Map<string, Uint8Array>()
