@@ -1,0 +1,10 @@
+# The fixtures are hashed byte-for-byte by the packer (scripts/build-clank.mjs).
+# core.autocrlf on Windows would otherwise check them out as CRLF while the
+# committed container holds LF bytes — making "rebuild the .clank" produce a
+# different content_hash on Windows than on Linux or macOS. Pin the fixture
+# tree to LF so the packed artifact is reproducible on every OS. The archive
+# and the rasters are binary and must never be line-end converted.
+src/fixtures/** text eol=lf
+*.clank binary
+*.clank.b64 binary
+*.png binary
