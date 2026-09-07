@@ -62,3 +62,21 @@ describe('Tauri security config (D9 config assertion)', () => {
     expect(connectSources.filter((s) => s.startsWith('http:') || s.startsWith('https:') || s.startsWith('ws:') || s.startsWith('wss:'))).toEqual(['http://ipc.localhost'])
   })
 })
+
+// The lint rule banning dangerouslySetInnerHTML is a guard rail on the same
+// footing as the capability allowlist: it must ship in every build, from the
+// first commit (M0 exit criterion: "a grep for dangerouslySetInnerHTML fails
+// the build"). Read eslint.config.js and assert the rule is still there, so a
+// quietly removed ban fails here in milliseconds.
+describe('ESLint config (D9 config assertion)', () => {
+  it('still bans dangerouslySetInnerHTML and HTML-string assignment', () => {
+    const eslintConfig = readFileSync(resolve(root, 'eslint.config.js'), 'utf8')
+    expect(eslintConfig).toMatch(/no-danger':\s*'error'/)
+    expect(eslintConfig).toMatch(/no-restricted-syntax/)
+    for (const banned of ['innerHTML', 'outerHTML', 'insertAdjacentHTML']) {
+      expect(eslintConfig, `no-restricted-syntax must still ban ${banned}`).toMatch(
+        new RegExp(`property.name="${banned}"`),
+      )
+    }
+  })
+})
