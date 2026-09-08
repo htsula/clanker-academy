@@ -8,15 +8,19 @@ name: Release
 # Release mechanics, written down where the release is made:
 #   - The release version is the tag's. Before tagging, bump all four version
 #     strings together in one commit: package.json, src-tauri/tauri.conf.json,
-#     src-tauri/Cargo.toml, src-tauri/Cargo.lock (the `app` package).
+#     src-tauri/Cargo.toml, src-tauri/Cargo.lock (the `app` package). This is
+#     not only a checklist line: the create-release job compares the tag
+#     against both JSON versions and refuses to open the release on a
+#     mismatch, and the builds depend on it — a wrong tag fails the run
+#     instead of attaching 0.0.0 installers to a page named v0.1.0.
 #   - There is deliberately NO fixture-packing step here. src/fixtures/course.clank
 #     is committed; ci.yml never packs, and tests/reproducibility.test.ts proves the
 #     committed artifact is exactly what the packer produces from the checked-out
 #     sources. If step 7 ever derives the manifest's app_version from package.json,
 #     "re-run npm run package:fixtures and commit src/fixtures/" becomes a line in
 #     the release checklist — until then no packing happens, here or in CI.
-#   - The release is created with the `gh` CLI (no third-party action): the first
-#     matrix job to finish creates it, the rest no-op through `gh release view`.
+#   - The release is created exactly once, by the create-release job; the three
+#     build jobs depend on it and only upload.
 
 on:
   push:
@@ -26,6 +30,38 @@ permissions:
   contents: write
 
 jobs:
+  create-release:
+    name: Verify tag and create the release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The tag must name the version being released
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(node -p "require('./package.json').version")
+          conf=$(node -p "JSON.parse(require('node:fs').readFileSync('src-tauri/tauri.conf.json', 'utf8')).version")
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package.json version $pkg" >&2
+            exit 1
+          fi
+          if [ "$tag" != "$conf" ]; then
+            echo "tag $GITHUB_REF_NAME does not match tauri.conf.json version $conf" >&2
+            exit 1
+          fi
+          echo "tag $GITHUB_REF_NAME matches both JSON versions ($pkg)"
+
+      - name: Create the release if it does not exist yet
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" ||
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --title "$GITHUB_REF_NAME" \
+              --notes "Unsigned installers for $GITHUB_REF_NAME. See the README for the macOS Gatekeeper and Windows SmartScreen override paths."
+
   check:
     name: Lint and test (${{ matrix.os }})
     strategy:
@@ -55,6 +91,7 @@ jobs:
 
   build:
     name: Build and upload (${{ matrix.os }})
+    needs: create-release
     strategy:
       fail-fast: false
       matrix:
@@ -96,9 +133,6 @@ jobs:
       - name: Smoke-check the bundled .clank asset
         run: node scripts/smoke-dist.mjs
 
-      - name: Create the release if it does not exist yet
-        run: gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" || gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --notes "Unsigned installers for $GITHUB_REF_NAME. See the README for the macOS Gatekeeper and Windows SmartScreen override paths."
-
       - name: Collect the installers
         shell: bash
         run: |
@@ -110,4 +144,5 @@ jobs:
           ls -l release-bundle
 
       - name: Upload installers to the release
+        shell: bash
         run: gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber release-bundle/*
