@@ -17,6 +17,7 @@
     "package:fixtures": "node scripts/make-figures.mjs && node scripts/build-clank.mjs"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.11.1",
     "fflate": "^0.8.3",
     "katex": "^0.18.5",
     "react": "^19.2.8",

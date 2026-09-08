@@ -1,0 +1,113 @@
+name: Release
+
+# M1 step 2 — unsigned releases. A tag `v*` builds the installers on all three
+# operating systems and attaches them to the release the tag names. No code
+# signing, no notarization, no updater: every bundle is unsigned by design
+# (BUILD-PLAN §11.2a) and the README carries the two override paths.
+#
+# Release mechanics, written down where the release is made:
+#   - The release version is the tag's. Before tagging, bump all four version
+#     strings together in one commit: package.json, src-tauri/tauri.conf.json,
+#     src-tauri/Cargo.toml, src-tauri/Cargo.lock (the `app` package).
+#   - There is deliberately NO fixture-packing step here. src/fixtures/course.clank
+#     is committed; ci.yml never packs, and tests/reproducibility.test.ts proves the
+#     committed artifact is exactly what the packer produces from the checked-out
+#     sources. If step 7 ever derives the manifest's app_version from package.json,
+#     "re-run npm run package:fixtures and commit src/fixtures/" becomes a line in
+#     the release checklist — until then no packing happens, here or in CI.
+#   - The release is created with the `gh` CLI (no third-party action): the first
+#     matrix job to finish creates it, the rest no-op through `gh release view`.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    name: Lint and test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+  build:
+    name: Build and upload (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Linux webkit2gtk dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'windows-latest' && 'x86_64-pc-windows-msvc' || (matrix.os == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '') }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint and test
+        run: npm run lint && npm test
+
+      - name: Build
+        run: npm run tauri build
+
+      - name: Smoke-check the bundled .clank asset
+        run: node scripts/smoke-dist.mjs
+
+      - name: Create the release if it does not exist yet
+        run: gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" || gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --notes "Unsigned installers for $GITHUB_REF_NAME. See the README for the macOS Gatekeeper and Windows SmartScreen override paths."
+
+      - name: Collect the installers
+        shell: bash
+        run: |
+          mkdir -p release-bundle
+          find src-tauri/target/release/bundle -type f \
+            \( -name '*.dmg' -o -name '*.msi' -o -name '*-setup.exe' \
+               -o -name '*.deb' -o -name '*.AppImage' -o -name '*.rpm' \) \
+            -exec cp {} release-bundle/ \;
+          ls -l release-bundle
+
+      - name: Upload installers to the release
+        run: gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber release-bundle/*
